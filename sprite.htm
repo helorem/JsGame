@@ -1,0 +1,148 @@
+<html>
+	<head>
+		<script type="text/javascript" src="functions.js"></script>
+		<script type="text/javascript" src="Sprite.js"></script>
+		<script type="text/javascript" src="GraphicItem.js"></script>
+		<script type="text/javascript" src="PhysicItem.js"></script>
+		<script type="text/javascript" src="Creature.js"></script>
+		<script type="text/javascript" src="Screen.js"></script>
+		<script type="text/javascript">
+			var MOVE_SPEED = 50;
+			var MOVE_STEP = 4;
+			var DIRECTIONS = ["N", "NE", "E", "SE", "S", "NW", "W", "SW"];
+			var RATIO_DIRECTION = [0.4142135623730951, 2.4142135623730945] // = (math.sin(math.radians(22.5)) / math.cos(math.radians(22.5))), (math.sin(math.radians(67.5)) / math.cos(math.radians(67.5)))
+
+			var g_images = {
+				"images/scrub.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 78, "h" : 114, "total_w" : 624, "total_h" : 1368, "orientation" : "v", "animation" : [
+					12, 12, 12, 12, 12, 12, 12, 12]},
+				"images/steppe.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 32, "h" : 32, "total_w" : 320, "total_h" : 992, "orientation" : "h", "animation" : [
+					16,	4, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 16, 16, 16, 16, 20, 4, 5, 16]}
+			};
+
+			var g_screen;
+
+
+			function start()
+			{
+				var canvas = document.getElementById("screen");
+				var ctx = canvas.getContext("2d");
+				g_screen = new Screen(ctx, "images/steppe.png", canvas.width, canvas.height);
+				
+				var item = new Creature(50, 50, "images/scrub.png");
+				g_screen.addItem(item);
+				
+				var item2 = new Creature(60, 50, "images/scrub.png");
+				g_screen.addItem(item2);
+
+				g_screen.looping = true;
+				g_screen.loop();
+			}
+
+			function action1()
+			{
+				//g_screen.items[0].turn(1);
+
+				var item = g_screen.items[0];
+				var item2 = g_screen.items[1];
+				item.isColliding(item2);
+			}
+
+			function action2()
+			{
+				g_screen.items[0].sprite.startAnimation([0, 1, 2, 1], 200);
+			}
+
+			function action3()
+			{
+				callback = function(i)
+				{
+					var moves = [
+						[200, 0],
+						[25, 25],
+						[0, 200],
+						[-25, 25],
+						[-200, 0],
+						[-25, -25],
+						[0, -200],
+						[25, -25]
+					];
+					if (i >= moves.length)
+					{
+						i = 0;
+					}
+					g_screen.items[0].move(moves[i][0], moves[i][1], function() {callback(i + 1)});
+				};
+				callback(0);
+			}
+
+			function action4()
+			{
+				var callback = function(i, item)
+				{
+					var moves = [
+						[50, 0],
+						[0, 50],
+						[-50, 0],
+						[0, -50]
+					];
+					if (i >= moves.length)
+					{
+						i = 0;
+					}
+					item.move(moves[i][0], moves[i][1], function() {callback(i + 1, item)});
+				};
+
+				for (var j = 1; j <= 10; j += 1)
+				{
+					for (var i = 1; i <= 25; i += 1)
+					{
+						var item = new Creature(i * 35, j * 35, "images/scrub.png");
+						g_screen.addItem(item);
+
+						callback(0, item);
+					}
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<canvas id="screen" width=1024 height=500 style="border : 1px solid #000000;"></canvas>
+		<br />
+		<button onClick="action1()">turn</button>
+		<button onClick="action2()">start anim</button>
+		<button onClick="action3()">move</button>
+		<button onClick="action4()">200 moves</button>
+		<script type="text/javascript">
+			function on_images_loaded()
+			{
+				var res = true;
+				for (var src in g_images)
+				{
+					if (g_images[src]["img"] == this)
+					{
+						g_images[src]["is_loaded"] = true;
+						loadImageData(src);
+						g_images[src]["img"] = null;
+					}
+					else if (!g_images[src]["is_loaded"])
+					{
+						res = false;
+					}
+				}
+
+				if (res)
+				{
+					start();
+				}
+			}
+
+			for (var src in g_images)
+			{
+				var img = new Image();
+				img.onload = on_images_loaded;
+				img.src = src;
+				g_images[src]["img"] = img;
+			}
+		</script>
+	</body>
+</html>
