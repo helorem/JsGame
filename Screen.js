@@ -20,11 +20,12 @@ Screen.prototype.init = function(ctx, background_file, w, h)
 	this.ctx = ctx;
 	this.items = [];
 	this.selected_items = [];
+	this.background_file = background_file;
 
 	this.background = document.createElement("canvas").getContext("2d");
 	this.background.canvas.width = this.w;
 	this.background.canvas.height = this.h;
-	var sprite = new Sprite(background_file);
+	var sprite = new Sprite(this.background_file);
 	sprite.setIndex(19); //TODO variable
 	var nb_frames = sprite.frames[sprite.index].length;
 	for (var y = 0; y < this.h; y += sprite.h)

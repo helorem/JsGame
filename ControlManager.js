@@ -76,6 +76,21 @@ ControlManager.prototype.onMouseUp = function(evt)
 		else
 		{
 			//selection
+			this.onSelection(square);
+		}
+	}
+}
+
+ControlManager.prototype.onSelection = function(square)
+{
+	if (this.getMode() == "create_wall")
+	{
+		WallManager.get().addWall(square[1], square[2], square[3], square[4]);
+	}
+	else
+	{
+		if (square[0] == BUTTON_LEFT)
+		{
 			Screen.get().unselectAll();
 			var items = Screen.get().getItemsIn(square[1], square[2], square[3], square[4]);
 			for (var i in items)
@@ -103,38 +118,36 @@ ControlManager.prototype.onClick = function(cursor)
 	var x = cursor[1];
 	var y = cursor[2];
 
-	switch (this.getMode())
+	if (this.getMode() == "create_creature")
 	{
-		case "create_creature":
-			this.actionCreateCreature(x, y, "images/scrub.png");
-			break;
-
-		default:
-			var item = Screen.get().getItemAt(x, y);
-			if (item)
+		this.actionCreateCreature(x, y, "images/scrub.png");
+	}
+	else
+	{
+		var item = Screen.get().getItemAt(x, y);
+		if (item)
+		{
+			if (button == BUTTON_LEFT)
 			{
-				if (button == BUTTON_LEFT)
-				{
-					Screen.get().unselectAll();
-					Screen.get().select(item);
-				}
+				Screen.get().unselectAll();
+				Screen.get().select(item);
+			}
+		}
+		else
+		{
+			if (button == BUTTON_LEFT)
+			{
+				Screen.get().unselectAll();
 			}
 			else
 			{
-				if (button == BUTTON_LEFT)
+				var items = Screen.get().getSelected();
+				for (var i in items)
 				{
-					Screen.get().unselectAll();
-				}
-				else
-				{
-					var items = Screen.get().getSelected();
-					for (var i in items)
-					{
-						this.actionMoveCreature(items[i], x, y);
-					}
+					this.actionMoveCreature(items[i], x, y);
 				}
 			}
-			break;
+		}
 	}
 }
 

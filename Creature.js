@@ -85,11 +85,11 @@ Creature.prototype.moveTo = function(x, y, callback)
 	this.steps = {"step_x" : step_x, "step_y" : step_y, "count" : step_count, "x" : x, "y" : y, "speed" : speed, "timestamp" : 0, "callback" : callback};
 }
 
-Creature.prototype.move = function(vec_x, vec_y, duration, callback)
+Creature.prototype.move = function(vec_x, vec_y, callback)
 {
 	var x = this.x + vec_x;
 	var y = this.y + vec_y;
-	this.moveTo(x, y, duration, callback);
+	this.moveTo(x, y, callback);
 }
 
 Creature.prototype.update = function(timestamp)

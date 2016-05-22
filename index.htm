@@ -5,13 +5,15 @@
 		<script type="text/javascript" src="GraphicItem.js"></script>
 		<script type="text/javascript" src="PhysicItem.js"></script>
 		<script type="text/javascript" src="Creature.js"></script>
+		<script type="text/javascript" src="Wall.js"></script>
 		<script type="text/javascript" src="Screen.js"></script>
 		<script type="text/javascript" src="ControlManager.js"></script>
 		<script type="text/javascript">
-			var MOVE_SPEED = 50;
-			var MOVE_STEP = 4;
+			var MOVE_SPEED = 25;
+			var MOVE_STEP = 3;
 			var DIRECTIONS = ["N", "NE", "E", "SE", "S", "NW", "W", "SW"];
-			var RATIO_DIRECTION = [0.4142135623730951, 2.4142135623730945] // = (math.sin(math.radians(22.5)) / math.cos(math.radians(22.5))), (math.sin(math.radians(67.5)) / math.cos(math.radians(67.5)))
+			var RATIO_DIRECTION = [(Math.sin(Math.radians(22.5)) / Math.cos(Math.radians(22.5))),
+								   (Math.sin(Math.radians(67.5)) / Math.cos(Math.radians(67.5)))];
 
 			var g_images = {
 				"images/scrub.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 78, "h" : 114, "total_w" : 624, "total_h" : 1368, "orientation" : "v", "selection_size" : 15, "animation" : [
@@ -26,8 +28,14 @@
 				var ctx = canvas.getContext("2d");
 				Screen.get().init(ctx, "images/steppe.png", canvas.width, canvas.height);
 				ControlManager.get().init(canvas, document.getElementById("action"));
+				WallManager.get().init(11);
 
 				var item = new Creature(50, 50, "images/scrub.png");
+				Screen.get().addItem(item);
+
+				var item = WallManager.get();
+				item.addWall(150, 50, 300, 50);
+				item.addWall(160, 50, 160, 100);
 				Screen.get().addItem(item);
 
 				Screen.get().looping = true;
@@ -42,63 +50,6 @@
 				var item2 = Screen.get().items[1];
 				item.isColliding(item2);
 			}
-
-			function action2()
-			{
-				Screen.get().items[0].sprite.startAnimation([0, 1, 2, 1], 200);
-			}
-
-			function action3()
-			{
-				callback = function(i)
-				{
-					var moves = [
-						[200, 0],
-						[25, 25],
-						[0, 200],
-						[-25, 25],
-						[-200, 0],
-						[-25, -25],
-						[0, -200],
-						[25, -25]
-					];
-					if (i >= moves.length)
-					{
-						i = 0;
-					}
-					Screen.get().items[0].move(moves[i][0], moves[i][1], function() {callback(i + 1)});
-				};
-				callback(0);
-			}
-
-			function action4()
-			{
-				var callback = function(i, item)
-				{
-					var moves = [
-						[50, 0],
-						[0, 50],
-						[-50, 0],
-						[0, -50]
-					];
-					if (i >= moves.length)
-					{
-						i = 0;
-					}
-					item.move(moves[i][0], moves[i][1], function() {callback(i + 1, item)});
-				};
-
-				for (var j = 1; j <= 10; j += 1)
-				{
-					for (var i = 1; i <= 25; i += 1)
-					{
-						var item = new Creature(i * 35, j * 35, "images/scrub.png");
-						Screen.get().addItem(item);
-
-						callback(0, item);
-					}
-				}
-			}
 		</script>
 	</head>
 	<body>
@@ -107,12 +58,10 @@
 		<select id="action">
 			<option value="default">Default</option>
 			<option value="create_creature">Create Creature</option>
+			<option value="create_wall">Create Wall</option>
 		</select>
 		<br />
-		<button onClick="action1()">turn</button>
-		<button onClick="action2()">start anim</button>
-		<button onClick="action3()">move</button>
-		<button onClick="action4()">200 moves</button>
+		<button onClick="action1()">action1</button>
 		<script type="text/javascript">
 			function on_images_loaded()
 			{
