@@ -78,6 +78,7 @@ Sprite.prototype.startAnimation = function(anim, interval)
 Sprite.prototype.stopAnimation = function()
 {
 	this.animation = null;
+	this.animation_index = 0;
 }
 
 

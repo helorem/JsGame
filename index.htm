@@ -6,6 +6,7 @@
 		<script type="text/javascript" src="PhysicItem.js"></script>
 		<script type="text/javascript" src="Creature.js"></script>
 		<script type="text/javascript" src="Screen.js"></script>
+		<script type="text/javascript" src="ControlManager.js"></script>
 		<script type="text/javascript">
 			var MOVE_SPEED = 50;
 			var MOVE_STEP = 4;
@@ -13,43 +14,38 @@
 			var RATIO_DIRECTION = [0.4142135623730951, 2.4142135623730945] // = (math.sin(math.radians(22.5)) / math.cos(math.radians(22.5))), (math.sin(math.radians(67.5)) / math.cos(math.radians(67.5)))
 
 			var g_images = {
-				"images/scrub.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 78, "h" : 114, "total_w" : 624, "total_h" : 1368, "orientation" : "v", "animation" : [
+				"images/scrub.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 78, "h" : 114, "total_w" : 624, "total_h" : 1368, "orientation" : "v", "selection_size" : 15, "animation" : [
 					12, 12, 12, 12, 12, 12, 12, 12]},
-				"images/steppe.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 32, "h" : 32, "total_w" : 320, "total_h" : 992, "orientation" : "h", "animation" : [
+				"images/steppe.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 32, "h" : 32, "total_w" : 320, "total_h" : 992, "orientation" : "h", "selection_size" : 0, "animation" : [
 					16,	4, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 16, 16, 16, 16, 20, 4, 5, 16]}
 			};
-
-			var g_screen;
-
 
 			function start()
 			{
 				var canvas = document.getElementById("screen");
 				var ctx = canvas.getContext("2d");
-				g_screen = new Screen(ctx, "images/steppe.png", canvas.width, canvas.height);
-				
-				var item = new Creature(50, 50, "images/scrub.png");
-				g_screen.addItem(item);
-				
-				var item2 = new Creature(60, 50, "images/scrub.png");
-				g_screen.addItem(item2);
+				Screen.get().init(ctx, "images/steppe.png", canvas.width, canvas.height);
+				ControlManager.get().init(canvas, document.getElementById("action"));
 
-				g_screen.looping = true;
-				g_screen.loop();
+				var item = new Creature(50, 50, "images/scrub.png");
+				Screen.get().addItem(item);
+
+				Screen.get().looping = true;
+				Screen.get().loop();
 			}
 
 			function action1()
 			{
-				//g_screen.items[0].turn(1);
+				//Screen.get().items[0].turn(1);
 
-				var item = g_screen.items[0];
-				var item2 = g_screen.items[1];
+				var item = Screen.get().items[0];
+				var item2 = Screen.get().items[1];
 				item.isColliding(item2);
 			}
 
 			function action2()
 			{
-				g_screen.items[0].sprite.startAnimation([0, 1, 2, 1], 200);
+				Screen.get().items[0].sprite.startAnimation([0, 1, 2, 1], 200);
 			}
 
 			function action3()
@@ -70,7 +66,7 @@
 					{
 						i = 0;
 					}
-					g_screen.items[0].move(moves[i][0], moves[i][1], function() {callback(i + 1)});
+					Screen.get().items[0].move(moves[i][0], moves[i][1], function() {callback(i + 1)});
 				};
 				callback(0);
 			}
@@ -97,7 +93,7 @@
 					for (var i = 1; i <= 25; i += 1)
 					{
 						var item = new Creature(i * 35, j * 35, "images/scrub.png");
-						g_screen.addItem(item);
+						Screen.get().addItem(item);
 
 						callback(0, item);
 					}
@@ -107,6 +103,11 @@
 	</head>
 	<body>
 		<canvas id="screen" width=1024 height=500 style="border : 1px solid #000000;"></canvas>
+		<br />
+		<select id="action">
+			<option value="default">Default</option>
+			<option value="create_creature">Create Creature</option>
+		</select>
 		<br />
 		<button onClick="action1()">turn</button>
 		<button onClick="action2()">start anim</button>
