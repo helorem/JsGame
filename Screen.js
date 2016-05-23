@@ -19,6 +19,7 @@ Screen.prototype.init = function(ctx, background_file, w, h)
 	this.h = h;
 	this.ctx = ctx;
 	this.items = [];
+	this.background_items = [];
 	this.selected_items = [];
 	this.background_file = background_file;
 
@@ -41,11 +42,17 @@ Screen.prototype.init = function(ctx, background_file, w, h)
 	}
 }
 
-
-Screen.prototype.addItem = function(item)
+Screen.prototype.addItem = function(item, is_background)
 {
 	item.sprite.screen = this;
-	this.items.push(item);
+	if (is_background)
+	{
+		this.background_items.push(item);
+	}
+	else
+	{
+		this.items.push(item);
+	}
 	this.setUpdateNeeded(true);
 }
 
@@ -56,17 +63,24 @@ Screen.prototype.setUpdateNeeded = function(need_update)
 
 Screen.prototype.draw = function(timestamp)
 {
+	var item;
 	for (var i in this.items)
 	{
-		var item = this.items[i];
+		item = this.items[i];
 		item.update(timestamp);
 	}
 	if (this.need_update)
 	{
 		this.ctx.drawImage(this.background.canvas, 0, 0);
+		for (var i in this.background_items)
+		{
+			item = this.background_items[i];
+			item.draw(this.ctx);
+		}
+
 		for (var i in this.items)
 		{
-			var item = this.items[i];
+			item = this.items[i];
 			item.draw(this.ctx);
 		}
 

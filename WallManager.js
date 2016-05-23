@@ -156,7 +156,7 @@ WallManager.prototype.createWallItem = function(x, y, index)
 			this.wall_item.setNext(item)
 		}
 		this.wall_item = item;
-		Screen.get().addItem(item);
+		Screen.get().addItem(item, true);
 	}
 	return item;
 }

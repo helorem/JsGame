@@ -98,6 +98,8 @@ Creature.prototype.update = function(timestamp)
 	{
 		if (timestamp >= this.steps["timestamp"])
 		{
+			var x = this.x;
+			var y = this.y;
 			if (this.steps["count"] > 0)
 			{
 				this.x += this.steps["step_x"];
@@ -109,10 +111,52 @@ Creature.prototype.update = function(timestamp)
 				this.x = this.steps["x"];
 				this.y = this.steps["y"];
 			}
-			this.steps["count"] -= 1;
-			var res = this.sprite.setPosition(this.x, this.y);
-			this.x = res[0];
-			this.y = res[1];
+
+			//Collision
+			var collision = false;
+			this.calcShapes();
+			console.debug("test collision", this.x, this.y, this.selection_size, this.square);
+			var item;
+			var items = Screen.get().background_items;
+			for (var i in items)
+			{
+				item = items[i];
+				if (item != this && this.isColliding(item))
+				{
+					console.debug("collision detected with", item.x, item.y, item.square);
+					collision = true;
+					break;
+				}
+			}
+			if (!collision)
+			{
+				var items = Screen.get().items;
+				for (var i in items)
+				{
+					item = items[i];
+					if (item != this && this.isColliding(item))
+					{
+						console.debug("collision detected with", item.x, item.y, item.square);
+						collision = true;
+						break;
+					}
+				}
+			}
+
+			if (collision)
+			{
+				this.steps["count"] = -1;
+				this.x = x;
+				this.y = y;
+			}
+			else
+			{
+				this.steps["count"] -= 1;
+				var res = this.sprite.setPosition(this.x, this.y);
+				this.x = res[0];
+				this.y = res[1];
+			}
+
 			if (this.steps["count"] < 0)
 			{
 				var callback = this.steps["callback"];

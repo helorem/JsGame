@@ -22,8 +22,8 @@ GraphicItem.prototype.draw = function(ctx)
 	if (this.selected)
 	{
 		ctx.beginPath();
-		ctx.rect(this.x - this.selection_size, this.y - this.selection_size, this.selection_size * 2, this.selection_size * 2);
-		//ctx.arc(this.x, this.y, this.selection_size, 0, TWO_PI);
+		ctx.rect(this.x - this.selection_size / 2, this.y - this.selection_size / 2, this.selection_size, this.selection_size);
+		//ctx.arc(this.x, this.y, this.selection_size / 2, 0, TWO_PI); // TODO improve calc
 		ctx.strokeStyle="#00FF00"; //TODO var
 		ctx.closePath();
 		ctx.stroke();
