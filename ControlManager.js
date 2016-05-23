@@ -148,7 +148,14 @@ ControlManager.prototype.onClick = function(cursor)
 				var items = Screen.get().getSelected();
 				for (var i in items)
 				{
-					this.actionMoveCreature(items[i], x, y);
+					if (this.getMode() == "find_path")
+					{
+						items[i].findPath(x, y);
+					}
+					else
+					{
+						this.actionMoveCreature(items[i], x, y);
+					}
 				}
 			}
 		}

@@ -84,6 +84,28 @@ Screen.prototype.draw = function(timestamp)
 			item.draw(this.ctx);
 		}
 
+		// TODO only for debug -------
+		for (var i in this.items)
+		{
+			item = this.items[i];
+			if (item.path)
+			{
+				console.debug("draw path from", item.x, item.y);
+				this.ctx.beginPath();
+				this.ctx.moveTo(item.x, item.y)
+				for (var j in item.path)
+				{
+					var p_i = item.path[j];
+					this.ctx.lineTo(p_i[0], p_i[1]);
+					console.debug("to", p_i[0], p_i[1]);
+				}
+				this.ctx.strokeStyle="#FF0000";
+				this.ctx.closePath();
+				this.ctx.stroke();
+			}
+		}
+		// -------------------------
+
 		if (this.selection_square)
 		{
 			this.drawSelectionSquare(this.selection_square[1], this.selection_square[2], this.selection_square[3], this.selection_square[4]);
