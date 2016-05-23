@@ -23,11 +23,11 @@ WALL_MAPPING = {
 	0b1111 : [17],
 };
 
-function WallItem(x, y, size)
+function WallItem(x, y, index)
 {
-	this.x = x;
-	this.y = y;
-	this.size = size;
+	PhysicItem.call(this, x, y, Screen.get().background_file);
+	this.sprite.setIndex(index);
+	this.size = this.sprite.w;
 	this.previous = null;
 	this.next = null;
 
@@ -37,18 +37,15 @@ function WallItem(x, y, size)
 	this.down = null;
 
 	this.state = 0b0000;
-	this.animation_index = 0;
 	this.updateAnimationIndex();
-
-	this.sprite_x = this.x - (this.size / 2);
-	this.sprite_y = this.y - (this.size / 2);
 }
+extend(PhysicItem, WallItem);
 
 WallItem.prototype.updateAnimationIndex = function()
 {
 	var indexes = WALL_MAPPING[this.state];
 	var i = Math.floor((Math.random() * indexes.length));
-	this.animation_index = indexes[i];
+	this.sprite.animation_index = indexes[i];
 }
 
 WallItem.prototype.setNext = function(item)
@@ -124,16 +121,15 @@ WallItem.prototype.linkIfPossible = function(item, not_recursive)
 	}
 }
 
-WallItem.prototype.draw = function(ctx, sprite)
+WallItem.prototype.draw = function(ctx)
 {
-	sprite.animation_index = this.animation_index;
-	sprite.x = this.sprite_x;
-	sprite.y = this.sprite_y;
-	sprite.draw(ctx);
+	this.sprite.draw(ctx);
 }
 
 function WallManager()
 {
+	this.size = 32; //TODO var
+	this.wall_item = null;
 }
 
 WallManager.get = function()
@@ -145,17 +141,7 @@ WallManager.get = function()
 	return arguments.callee.instance
 }
 
-WallManager.prototype.init = function(index)
-{
-	PhysicItem.call(this, 0, 0, Screen.get().background_file);
-	this.sprite.setIndex(index);
-
-	this.size = this.sprite.w;
-	this.wall_item = null;
-}
-extend(PhysicItem, WallManager);
-
-WallManager.prototype.createWallItem = function(x, y)
+WallManager.prototype.createWallItem = function(x, y, index)
 {
 	var item = null;
 	if (this.wall_item)
@@ -164,22 +150,23 @@ WallManager.prototype.createWallItem = function(x, y)
 	}
 	if (!item)
 	{
-		item = new WallItem(x, y, this.size, this.wall_item);
+		item = new WallItem(x, y, index);
 		if (this.wall_item)
 		{
 			this.wall_item.setNext(item)
 		}
 		this.wall_item = item;
+		Screen.get().addItem(item);
 	}
 	return item;
 }
 
-WallManager.prototype.addWall = function(x1, y1, x2, y2)
+WallManager.prototype.addWall = function(index, x1, y1, x2, y2)
 {
-	x1 -= x1 % this.sprite.w;
-	y1 -= y1 % this.sprite.h;
-	x2 -= x2 % this.sprite.w;
-	y2 -= y2 % this.sprite.h;
+	x1 -= x1 % this.size;
+	y1 -= y1 % this.size;
+	x2 -= x2 % this.size;
+	y2 -= y2 % this.size;
 
 	var tmp;
 	if (x1 > x2)
@@ -196,31 +183,21 @@ WallManager.prototype.addWall = function(x1, y1, x2, y2)
 		y2 = tmp;
 	}
 
-	var item;
-	if (x2 - x1 > y2 - y1)
+	var x = x1;
+	var y = y1;
+	while (x < x2 || y < y2)
 	{
-		for (var x = x1; x <= x2; x += this.size)
+		this.createWallItem(x, y, index);
+		if (x < x2)
 		{
-			this.createWallItem(x, y1);
+			x += this.size;
+		}
+
+		if (y < y2)
+		{
+			y += this.size;
 		}
 	}
-	else
-	{
-		for (var y = y1; y <= y2; y += this.size)
-		{
-			this.createWallItem(x1, y);
-		}
-	}
+	this.createWallItem(x, y, index);
 }
-
-WallManager.prototype.draw = function(ctx)
-{
-	var current = this.wall_item;
-	while (current)
-	{
-		current.draw(ctx, this.sprite);
-		current = current.previous;
-	}
-}
-
 

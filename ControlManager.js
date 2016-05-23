@@ -83,9 +83,13 @@ ControlManager.prototype.onMouseUp = function(evt)
 
 ControlManager.prototype.onSelection = function(square)
 {
-	if (this.getMode() == "create_wall")
+	if (this.getMode() == "create_wall1")
 	{
-		WallManager.get().addWall(square[1], square[2], square[3], square[4]);
+		WallManager.get().addWall(10, square[1], square[2], square[3], square[4]);
+	}
+	else if (this.getMode() == "create_wall2")
+	{
+		WallManager.get().addWall(11, square[1], square[2], square[3], square[4]);
 	}
 	else
 	{

@@ -5,7 +5,7 @@
 		<script type="text/javascript" src="GraphicItem.js"></script>
 		<script type="text/javascript" src="PhysicItem.js"></script>
 		<script type="text/javascript" src="Creature.js"></script>
-		<script type="text/javascript" src="Wall.js"></script>
+		<script type="text/javascript" src="WallManager.js"></script>
 		<script type="text/javascript" src="Screen.js"></script>
 		<script type="text/javascript" src="ControlManager.js"></script>
 		<script type="text/javascript">
@@ -28,15 +28,12 @@
 				var ctx = canvas.getContext("2d");
 				Screen.get().init(ctx, "images/steppe.png", canvas.width, canvas.height);
 				ControlManager.get().init(canvas, document.getElementById("action"));
-				WallManager.get().init(11);
 
 				var item = new Creature(50, 50, "images/scrub.png");
 				Screen.get().addItem(item);
 
-				var item = WallManager.get();
-				item.addWall(150, 50, 300, 50);
-				item.addWall(160, 50, 160, 100);
-				Screen.get().addItem(item);
+				WallManager.get().addWall(11, 150, 50, 300, 50);
+				WallManager.get().addWall(11, 160, 50, 160, 100);
 
 				Screen.get().looping = true;
 				Screen.get().loop();
@@ -58,7 +55,8 @@
 		<select id="action">
 			<option value="default">Default</option>
 			<option value="create_creature">Create Creature</option>
-			<option value="create_wall">Create Wall</option>
+			<option value="create_wall1">Create Wall 1</option>
+			<option value="create_wall2">Create Wall 2</option>
 		</select>
 		<br />
 		<button onClick="action1()">action1</button>
