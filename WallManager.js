@@ -163,10 +163,20 @@ WallManager.prototype.createWallItem = function(x, y, index)
 
 WallManager.prototype.addWall = function(index, x1, y1, x2, y2)
 {
+	x1 -= this.size / 2;
+	y1 -= this.size / 2;
+	x2 -= this.size / 2;
+	y2 -= this.size / 2;
+
 	x1 -= x1 % this.size;
 	y1 -= y1 % this.size;
 	x2 -= x2 % this.size;
 	y2 -= y2 % this.size;
+
+	x1 += this.size / 2;
+	y1 += this.size / 2;
+	x2 += this.size / 2;
+	y2 += this.size / 2;
 
 	var tmp;
 	if (x1 > x2)

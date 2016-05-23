@@ -23,6 +23,8 @@ Screen.prototype.init = function(ctx, background_file, w, h)
 	this.selected_items = [];
 	this.background_file = background_file;
 
+	this.debug_items = []; //TODO for debug
+
 	this.background = document.createElement("canvas").getContext("2d");
 	this.background.canvas.width = this.w;
 	this.background.canvas.height = this.h;
@@ -85,24 +87,9 @@ Screen.prototype.draw = function(timestamp)
 		}
 
 		// TODO only for debug -------
-		for (var i in this.items)
+		for (var i in this.debug_items)
 		{
-			item = this.items[i];
-			if (item.path)
-			{
-				console.debug("draw path from", item.x, item.y);
-				this.ctx.beginPath();
-				this.ctx.moveTo(item.x, item.y)
-				for (var j in item.path)
-				{
-					var p_i = item.path[j];
-					this.ctx.lineTo(p_i[0], p_i[1]);
-					console.debug("to", p_i[0], p_i[1]);
-				}
-				this.ctx.strokeStyle="#FF0000";
-				this.ctx.closePath();
-				this.ctx.stroke();
-			}
+			this.debug_items[i](this.ctx);
 		}
 		// -------------------------
 

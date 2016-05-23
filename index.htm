@@ -1,6 +1,7 @@
 <html>
 	<head>
 		<script type="text/javascript" src="functions.js"></script>
+		<script type="text/javascript" src="PathFinding.js"></script>
 		<script type="text/javascript" src="Sprite.js"></script>
 		<script type="text/javascript" src="GraphicItem.js"></script>
 		<script type="text/javascript" src="PhysicItem.js"></script>
@@ -18,7 +19,7 @@
 			var g_images = {
 				"images/scrub.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 78, "h" : 114, "total_w" : 624, "total_h" : 1368, "orientation" : "v", "selection_size" : 32, "animation" : [
 					12, 12, 12, 12, 12, 12, 12, 12]},
-				"images/steppe.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 32, "h" : 32, "total_w" : 320, "total_h" : 992, "orientation" : "h", "selection_size" : 0, "animation" : [
+				"images/steppe.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 32, "h" : 32, "total_w" : 320, "total_h" : 992, "orientation" : "h", "selection_size" : 32, "animation" : [
 					16,	4, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 16, 16, 16, 16, 20, 4, 5, 16]}
 			};
 
@@ -29,17 +30,20 @@
 				Screen.get().init(ctx, "images/steppe.png", canvas.width, canvas.height);
 				ControlManager.get().init(canvas, document.getElementById("action"));
 
-				var item = new Creature(50, 150, "images/scrub.png");
+				var item = new Creature(1*32, 5*32, "images/scrub.png");
 				Screen.get().addItem(item);
 
-				WallManager.get().addWall(11, 100, 50, 300, 50);
-				WallManager.get().addWall(11, 120, 50, 120, 300);
+				WallManager.get().addWall(11, 0, 2*32, 7*32, 2*32);
+				WallManager.get().addWall(11, 0, 9*32, 7*32, 9*32);
+				WallManager.get().addWall(11, 4*32, 2*32, 4*32, 7*32);
+				WallManager.get().addWall(11, 7*32, 4*32, 7*32, 9*32);
 
 				Screen.get().looping = true;
 				Screen.get().loop();
 
-				Screen.get().items[0].moveTo(200, 150);
+				//Screen.get().items[0].moveTo(200, 150);
 				//Screen.get().items[0].moveTo(200, 150, function(){ Screen.get().items[0].moveTo(50, 150); });
+				Screen.get().items[0].findPath(9*32, 5*32);
 			}
 
 			function action1()

@@ -4,7 +4,6 @@ function Creature(x, y, img_file)
 
 	this.direction = 0;
 	this.steps = null;
-	this.path = null;
 }
 extend(PhysicItem, Creature);
 
@@ -28,9 +27,7 @@ Creature.prototype.turn = function(mod)
 
 Creature.prototype.findPath = function(dst_x, dst_y)
 {
-	this.path = [
-			[dst_x, dst_y]
-		];
+	findPath(this.x, this.y, dst_x, dst_y);
 }
 
 Creature.prototype.moveTo = function(x, y, callback)
