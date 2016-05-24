@@ -9,6 +9,7 @@
 		<script type="text/javascript" src="WallManager.js"></script>
 		<script type="text/javascript" src="Screen.js"></script>
 		<script type="text/javascript" src="ControlManager.js"></script>
+		<script type="text/javascript" src="Maze.js"></script>
 		<script type="text/javascript">
 			var MOVE_SPEED = 25;
 			var MOVE_STEP = 3;
@@ -30,11 +31,15 @@
 				Screen.get().init(ctx, json, canvas.width, canvas.height);
 				ControlManager.get().init(canvas, document.getElementById("action"));
 
+				/*
 				for (var i in json.player.walls)
 				{
 					var item = json.player.walls[i];
 					WallManager.get().addWall(item[0], item[1], item[2], item[3], item[4]);
 				}
+				*/
+
+				generateMaze(3*32, 32, 13*32, 15*32);
 
 				for (var i in json.player.creatures)
 				{
@@ -42,10 +47,15 @@
 					Screen.get().addItem(new Creature(item[0], item[1], item[2]));
 				}
 
+				var x = 16*32;
+				var y = 5*32;
+				Screen.get().addItem(new Creature(x, y, "images/scrub.png"));
+				Screen.get().items[0].findPath(x, y);
+
+
 				Screen.get().looping = true;
 				Screen.get().loop();
 
-				Screen.get().items[0].findPath(9*32, 5*32);
 			}
 
 			function action1()
@@ -57,7 +67,7 @@
 		</script>
 	</head>
 	<body>
-		<canvas id="screen" width=1024 height=500 style="border : 1px solid #000000;"></canvas>
+		<canvas id="screen" width=1024 height=480 style="border : 1px solid #000000;"></canvas>
 		<br />
 		<select id="action">
 			<option value="default">Default</option>

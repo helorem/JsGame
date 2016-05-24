@@ -209,7 +209,7 @@ PathFinder.prototype.calcLines = function()
 
 PathFinder.prototype._insertPointIfNotExists = function(x, y)
 {
-	if (x >= 0 && y >= 0)
+	if (x >= 0 && y >= 0 && x < Screen.get().w && y < Screen.get().h)
 	{
 		var found = false;
 		for (var i in this.points)
@@ -320,7 +320,7 @@ PathFinder.prototype.testLine = function(pt1, pt2, line, is_temp)
 	{
 		vec_x = pt2.x - pt1.x;
 		vec_y = pt2.y - pt1.y;
-		weight = (vec_x * vec_x) + (vec_y * vec_y);
+		weight = Math.round(Math.sqrt((vec_x * vec_x) + (vec_y * vec_y)));
 		link = new GraphLink(pt1, pt2, weight);
 		if (is_temp)
 		{
@@ -340,8 +340,6 @@ PathFinder.prototype.testLine = function(pt1, pt2, line, is_temp)
 PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 {
 	Screen.get().debug_items = []; // TODO debug only
-
-	console.debug("find path", x1, y1, x2, y2);
 
 	var begin = new GraphItem(x1, y1);
 	var end = new GraphItem(x2, y2, true);
@@ -379,6 +377,7 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 	}
 
 	// TODO debug only --------------------
+	/*
 	var me = this;
 	Screen.get().debug_items.push(function(ctx) {
 		ctx.beginPath();
@@ -406,14 +405,13 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 		ctx.closePath();
 		ctx.stroke();
 	});
-
+	*/
 	Screen.get().debug_items.push(function(ctx) {
 		ctx.beginPath();
 		ctx.strokeStyle="#FF0000";
 		ctx.moveTo(x1, y1);
 		for (var i in res)
 		{
-			console.debug(res[i].x, res[i].y);
 			ctx.lineTo(res[i].x, res[i].y);
 			ctx.moveTo(res[i].x, res[i].y);
 		}
