@@ -11,7 +11,7 @@ Screen.get = function()
 	return arguments.callee.instance
 }
 
-Screen.prototype.init = function(ctx, background_file, w, h)
+Screen.prototype.init = function(ctx, json, w, h)
 {
 	this.need_update = false;
 	this.looping = false;
@@ -21,27 +21,34 @@ Screen.prototype.init = function(ctx, background_file, w, h)
 	this.items = [];
 	this.background_items = [];
 	this.selected_items = [];
-	this.background_file = background_file;
+	this.background_file = json.land.image_file;
 
 	this.debug_items = []; //TODO for debug
 
-	this.background = document.createElement("canvas").getContext("2d");
-	this.background.canvas.width = this.w;
-	this.background.canvas.height = this.h;
-	var sprite = new Sprite(this.background_file);
-	sprite.setIndex(19); //TODO variable
-	var nb_frames = sprite.frames[sprite.index].length;
-	for (var y = 0; y < this.h; y += sprite.h)
+	this.tiles = [];
+	var x = 0;
+	var y = 0;
+	for (var i in json.land.tiles)
 	{
-		for (var x = 0; x < this.w; x += sprite.w)
+		var tile = json.land.tiles[i];
+		var sprite = new Sprite(this.background_file);
+		sprite.setIndex(tile[0]);
+
+		sprite.x = x;
+		sprite.y = y;
+		sprite.animation_index = tile[1];
+
+		this.tiles.push(sprite);
+
+		x += sprite.w;
+		if (x >= this.w)
 		{
-			sprite.x = x;
-			sprite.y = y;
-			sprite.animation_index = Math.floor((Math.random() * nb_frames));
-			sprite.draw(this.background);
-			sprite.draw(this.ctx);
+			x = 0;
+			y += sprite.h;
 		}
+
 	}
+	this.setUpdateNeeded(true);
 }
 
 Screen.prototype.addItem = function(item, is_background)
@@ -73,7 +80,12 @@ Screen.prototype.draw = function(timestamp)
 	}
 	if (this.need_update)
 	{
-		this.ctx.drawImage(this.background.canvas, 0, 0);
+		for (var i in this.tiles)
+		{
+			item = this.tiles[i];
+			item.draw(this.ctx);
+		}
+
 		for (var i in this.background_items)
 		{
 			item = this.background_items[i];

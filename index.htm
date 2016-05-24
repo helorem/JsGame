@@ -23,33 +23,33 @@
 					16,	4, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 16, 16, 16, 16, 20, 4, 5, 16]}
 			};
 
-			function start()
+			function start(json)
 			{
 				var canvas = document.getElementById("screen");
 				var ctx = canvas.getContext("2d");
-				Screen.get().init(ctx, "images/steppe.png", canvas.width, canvas.height);
+				Screen.get().init(ctx, json, canvas.width, canvas.height);
 				ControlManager.get().init(canvas, document.getElementById("action"));
 
-				var item = new Creature(1*32, 5*32, "images/scrub.png");
-				Screen.get().addItem(item);
+				for (var i in json.player.walls)
+				{
+					var item = json.player.walls[i];
+					WallManager.get().addWall(item[0], item[1], item[2], item[3], item[4]);
+				}
 
-				WallManager.get().addWall(11, 0, 2*32, 7*32, 2*32);
-				WallManager.get().addWall(11, 0, 9*32, 7*32, 9*32);
-				WallManager.get().addWall(11, 4*32, 2*32, 4*32, 7*32);
-				WallManager.get().addWall(11, 7*32, 4*32, 7*32, 9*32);
+				for (var i in json.player.creatures)
+				{
+					var item = json.player.creatures[i];
+					Screen.get().addItem(new Creature(item[0], item[1], item[2]));
+				}
 
 				Screen.get().looping = true;
 				Screen.get().loop();
 
-				//Screen.get().items[0].moveTo(200, 150);
-				//Screen.get().items[0].moveTo(200, 150, function(){ Screen.get().items[0].moveTo(50, 150); });
 				Screen.get().items[0].findPath(9*32, 5*32);
 			}
 
 			function action1()
 			{
-				//Screen.get().items[0].turn(1);
-
 				var item = Screen.get().items[0];
 				var item2 = Screen.get().items[1];
 				item.isColliding(item2);
@@ -88,7 +88,7 @@
 
 				if (res)
 				{
-					start();
+					getJson("test_game.json", start);
 				}
 			}
 

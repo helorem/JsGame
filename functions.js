@@ -85,3 +85,55 @@ function loadImageData(src)
 	g_images[src]["frames"] = frames;
 }
 
+function getJson(url, callback, param)
+{
+	var xhr;
+	try
+	{
+		xhr = new ActiveXObject('Msxml2.XMLHTTP');
+	}
+	catch (e)
+	{
+		try
+		{
+			xhr = new ActiveXObject('Microsoft.XMLHTTP');
+		}
+		catch (e2)
+		{
+			try
+			{
+				xhr = new XMLHttpRequest();
+			}
+			catch (e3)
+			{
+				xhr = false;
+			}
+		}
+	}
+	xhr.onreadystatechange = function()
+	{
+		if(xhr.readyState == 4)
+		{
+			if (xhr.status == 200)
+			{
+				var json = JSON.parse(xhr.responseText);
+				if (param)
+				{
+					callback(json, param);
+				}
+				else
+				{
+					callback(json);
+				}
+			}
+			else
+			{
+				console.warning("Error(" + xhr.status + ") : " + xhr.statusText);
+			}
+		}
+	};
+	xhr.open("GET", url,  true);
+	xhr.send(null);
+}
+
+
