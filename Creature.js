@@ -27,7 +27,7 @@ Creature.prototype.turn = function(mod)
 
 Creature.prototype.findPath = function(dst_x, dst_y)
 {
-	findPath(this.x, this.y, dst_x, dst_y);
+	PathFinder.get().findPath(this.x, this.y, dst_x, dst_y);
 }
 
 Creature.prototype.moveTo = function(x, y, callback)

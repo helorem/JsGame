@@ -209,5 +209,6 @@ WallManager.prototype.addWall = function(index, x1, y1, x2, y2)
 		}
 	}
 	this.createWallItem(x, y, index);
+	PathFinder.get().update();
 }
 
