@@ -11,7 +11,7 @@ Screen.get = function()
 	return arguments.callee.instance
 }
 
-Screen.prototype.init = function(ctx, json, w, h)
+Screen.prototype.init = function(ctx, w, h)
 {
 	this.need_update = false;
 	this.looping = false;
@@ -21,33 +21,9 @@ Screen.prototype.init = function(ctx, json, w, h)
 	this.items = [];
 	this.background_items = [];
 	this.selected_items = [];
-	this.background_file = json.land.image_file;
 
 	this.debug_items = []; //TODO for debug
 
-	this.tiles = [];
-	var x = 0;
-	var y = 0;
-	for (var i in json.land.tiles)
-	{
-		var tile = json.land.tiles[i];
-		var sprite = new Sprite(this.background_file);
-		sprite.setIndex(tile[0]);
-
-		sprite.x = x;
-		sprite.y = y;
-		sprite.animation_index = tile[1];
-
-		this.tiles.push(sprite);
-
-		x += sprite.w;
-		if (x >= this.w)
-		{
-			x = 0;
-			y += sprite.h;
-		}
-
-	}
 	this.setUpdateNeeded(true);
 }
 
@@ -80,9 +56,11 @@ Screen.prototype.draw = function(timestamp)
 	}
 	if (this.need_update)
 	{
-		for (var i in this.tiles)
+		var tiles = World.get().tiles;
+
+		for (var i in tiles)
 		{
-			item = this.tiles[i];
+			item = tiles[i];
 			item.draw(this.ctx);
 		}
 

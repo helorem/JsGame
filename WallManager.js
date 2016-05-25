@@ -23,6 +23,32 @@ WALL_MAPPING = {
 	0b1111 : [17],
 };
 
+function chooseWallIndex(tile)
+{
+	var state = 0;
+	if (tile.left && (tile.left.type & TYPE_WALL))
+	{
+		state |= WALL_W;
+	}
+	if (tile.right && (tile.right.type & TYPE_WALL))
+	{
+		state |= WALL_E;
+	}
+	if (tile.up && (tile.up.type & TYPE_WALL))
+	{
+		state |= WALL_N;
+	}
+	if (tile.down && (tile.down.type & TYPE_WALL))
+	{
+		state |= WALL_S;
+	}
+	console.debug(tile.x, tile.y, state);
+	var indexes = WALL_MAPPING[state];
+	var i = Math.floor((Math.random() * indexes.length));
+	return indexes[i];
+}
+
+/*
 function WallItem(x, y, index)
 {
 	PhysicItem.call(this, x, y, Screen.get().background_file);
@@ -125,10 +151,11 @@ WallItem.prototype.draw = function(ctx)
 {
 	this.sprite.draw(ctx);
 }
+*/
 
 function WallManager()
 {
-	this.size = 32; //TODO var
+	this.size = World.get().tile_size;
 	this.wall_item = null;
 }
 
@@ -143,6 +170,12 @@ WallManager.get = function()
 
 WallManager.prototype.createWallItem = function(x, y, index)
 {
+	var item = World.get().getTile(x, y);
+	item.setType(TYPE_WALL);
+	item.setIndex(index);
+	return item;
+
+	/*
 	var item = null;
 	if (this.wall_item)
 	{
@@ -159,6 +192,7 @@ WallManager.prototype.createWallItem = function(x, y, index)
 		Screen.get().addItem(item, true);
 	}
 	return item;
+	*/
 }
 
 WallManager.prototype.addWall = function(index, x1, y1, x2, y2)
