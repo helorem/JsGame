@@ -7,7 +7,7 @@
 			[11, 224, 128, 224, 288]
 		],
 		"creatures" : [
-			[32, 160, "images/scrub.png"]
+			[16, 176, "images/scrub.png"]
 		]
 	},
 	"land" : {

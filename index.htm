@@ -1,5 +1,8 @@
 <html>
 	<head>
+		<!-- TODO REMOVE -->
+		<script type='text/javascript' src="//assets-datawrapper.s3.amazonaws.com/vendor/chroma-js/0.5.2/chroma.min.js"></script>
+
 		<script type="text/javascript" src="functions.js"></script>
 		<script type="text/javascript" src="PathFinding.js"></script>
 		<script type="text/javascript" src="Sprite.js"></script>
@@ -33,25 +36,33 @@
 				Screen.get().init(ctx, canvas.width, canvas.height);
 				ControlManager.get().init(canvas, document.getElementById("action"));
 
+				/*
 				for (var i in json.player.walls)
 				{
 					var item = json.player.walls[i];
 					WallManager.get().addWall(item[0], item[1], item[2], item[3], item[4]);
 				}
+				*/
 
-				//generateMaze(3*32, 32, 13*32, 15*32);
+				generateMaze(3*32, 32, 13*32, 16*32);
 
+				/*
 				for (var i in json.player.creatures)
 				{
 					var item = json.player.creatures[i];
 					Screen.get().addItem(new Creature(item[0], item[1], item[2]));
 				}
+				*/
 
-				var x = 16*32;
-				var y = 5*32;
-				Screen.get().addItem(new Creature(x, y, "images/scrub.png"));
-				//Screen.get().items[0].findPath(x, y);
+				var x1 = 0*32 + 16;
+				var y1 = 5*32 + 16;
+				Screen.get().addItem(new Creature(x1, y1, "images/scrub.png"));
 
+				var x2 = 16*32 + 16;
+				var y2 = 5*32 + 16;
+				Screen.get().addItem(new Creature(x2, y2, "images/scrub.png"));
+
+				Screen.get().items[1].findPath(x1, y1);
 
 				Screen.get().looping = true;
 				Screen.get().loop();
@@ -67,7 +78,7 @@
 		</script>
 	</head>
 	<body>
-		<canvas id="screen" width=1024 height=480 style="border : 1px solid #000000;"></canvas>
+		<canvas id="screen" width=1024 height=512 style="border : 1px solid #000000;"></canvas>
 		<br />
 		<select id="action">
 			<option value="default">Default</option>

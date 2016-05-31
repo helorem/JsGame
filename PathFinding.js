@@ -1,3 +1,139 @@
+
+function PathFinder()
+{
+	this.blocks = null;
+	this.lines = null;
+	this.points = null;
+	this.current_path_id = 0;
+}
+
+PathFinder.get = function()
+{
+	if (!arguments.callee.instance)
+	{
+		arguments.callee.instance = new PathFinder();
+	}
+	return arguments.callee.instance
+}
+
+PathFinder.prototype.createPathId = function()
+{
+	this.current_path_id += 1;
+	return this.current_path_id;
+}
+
+// TODO remove
+PathFinder.prototype.update = function()
+{
+}
+
+PathFinder.prototype.findPath = function(x1, y1, x2, y2)
+{
+	Screen.get().debug_items = []; // TODO debug only
+	var res = [];
+
+	console.debug("path to", x1, x2, y1, y2);
+
+	var start_tile = World.get().getTile(x1, y1);
+	start_tile.current_path_parent = null;
+	var end_tile = World.get().getTile(x2, y2);
+
+	var tile_list = [start_tile];
+	var path_id = PathFinder.get().createPathId();
+
+	var nodes = []; // TODO remove
+	while (tile_list.length > 0)
+	{
+		var tile = tile_list.shift();
+		if (tile == end_tile)
+		{
+			// the tile is the end
+			tile.setBestPath(null);
+			break;
+		}
+		else
+		{
+			tile.current_path_id = path_id;
+
+			nodes.push(tile); // TODO remove
+
+			var childs = [tile.left, tile.right, tile.up, tile.down];
+
+			for (var i in childs)
+			{
+				var child = childs[i];
+				if (child)
+				{
+					if ((child.type & TYPE_WATER) | (child.type & TYPE_WALL))
+					{
+						// we cannot walk on the tile
+					}
+					else if (child.current_path_id != path_id)
+					{
+						child.current_path_id = path_id;
+						child.current_path_parent = tile;
+						child.current_path_val = tile.current_path_val + tile.ground_speed;
+						tile_list.push(child);
+					}
+				}
+			}
+		}
+	}
+
+	console.debug("nb tile analysed", nodes.length);
+	nodes.shift();
+
+	var res = [];
+	var tile = start_tile;
+	while (tile)
+	{
+		res.push(tile);
+		tile = tile.current_path_best;
+	}
+
+	// TODO debug only --------------------
+	Screen.get().debug_items.push(function(ctx) {
+		colors = chroma.interpolate.bezier(["blue", "red"]);
+		cs = chroma.scale(colors).mode('lab').correctLightness(true);
+		cols = [];
+		var steps = nodes[nodes.length - 1].current_path_val;
+		for (var i = 0; i < steps; ++i)
+		{
+			var t = i / (steps - 1);
+			cols.push(cs(t).hex());
+		}
+
+		for (var i in nodes)
+		{
+			ctx.fillStyle = cols[nodes[i].current_path_val];
+			ctx.fillRect(nodes[i].x + 1 - 16, nodes[i].y + 1 - 16, 30, 30);
+		}
+	});
+
+	Screen.get().setUpdateNeeded(true);
+	//-------------
+
+	// TODO debug only --------------------
+	Screen.get().debug_items.push(function(ctx) {
+		ctx.beginPath();
+		ctx.strokeStyle="#00FF00";
+		ctx.moveTo(x1, y1);
+		for (var i in res)
+		{
+			ctx.lineTo(res[i].x, res[i].y);
+			ctx.moveTo(res[i].x, res[i].y);
+		}
+		ctx.closePath();
+		ctx.stroke();
+	});
+
+	Screen.get().setUpdateNeeded(true);
+	//-------------
+}
+
+
+
+/*
 LEFT = 0;
 RIGHT = 1;
 TOP = 2;
@@ -406,6 +542,7 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 		ctx.stroke();
 	});
 	*/
+	/*
 	Screen.get().debug_items.push(function(ctx) {
 		ctx.beginPath();
 		ctx.strokeStyle="#FF0000";
@@ -422,3 +559,5 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 	Screen.get().setUpdateNeeded(true);
 	//-------------
 }
+
+*/

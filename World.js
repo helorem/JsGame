@@ -17,6 +17,11 @@ function WorldTile(x, y, img_file, index, sub_index, ground_speed)
 	this.ground_speed = ground_speed;
 
 	this.type = TYPE_NORMAL;
+
+	this.current_path_parent = null;
+	this.current_path_id = 0;
+	this.current_path_best = null;
+	this.current_path_val = 0;
 }
 extend(GraphicItem, WorldTile);
 
@@ -45,6 +50,15 @@ WorldTile.prototype.setSubIndex = function(sub_index)
 	{
 		this.sprite.animation_index = sub_index;
 		this._updated();
+	}
+}
+
+WorldTile.prototype.setBestPath = function(tile)
+{
+	this.current_path_best = tile;
+	if (this.current_path_parent)
+	{
+		this.current_path_parent.setBestPath(this);
 	}
 }
 
@@ -117,6 +131,23 @@ WorldTile.prototype.linkDown = function(o_tile)
 	}
 	this._updated();
 }
+
+WorldTile.prototype.draw = function(ctx)
+{
+	this.sprite.draw(ctx);
+
+	// TODO debug only ------
+	ctx.beginPath();
+	ctx.moveTo(this.sprite.x, this.sprite.y);
+	ctx.lineTo(this.sprite.x + World.get().tile_size, this.sprite.y);
+	ctx.moveTo(this.sprite.x, this.sprite.y);
+	ctx.lineTo(this.sprite.x, this.sprite.y + World.get().tile_size);
+	ctx.strokeStyle="#FFFFFF";
+	ctx.closePath();
+	ctx.stroke();
+	//-----------------------
+}
+
 
 function World()
 {

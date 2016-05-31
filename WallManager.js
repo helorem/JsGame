@@ -42,7 +42,6 @@ function chooseWallIndex(tile)
 	{
 		state |= WALL_S;
 	}
-	console.debug(tile.x, tile.y, state);
 	var indexes = WALL_MAPPING[state];
 	var i = Math.floor((Math.random() * indexes.length));
 	return indexes[i];
