@@ -47,115 +47,10 @@ function chooseWallIndex(tile)
 	return indexes[i];
 }
 
-/*
-function WallItem(x, y, index)
-{
-	PhysicItem.call(this, x, y, Screen.get().background_file);
-	this.sprite.setIndex(index);
-	this.size = this.sprite.w;
-	this.previous = null;
-	this.next = null;
-
-	this.left = null;
-	this.right = null;
-	this.up = null;
-	this.down = null;
-
-	this.state = 0b0000;
-	this.updateAnimationIndex();
-}
-extend(PhysicItem, WallItem);
-
-WallItem.prototype.updateAnimationIndex = function()
-{
-	var indexes = WALL_MAPPING[this.state];
-	var i = Math.floor((Math.random() * indexes.length));
-	this.sprite.animation_index = indexes[i];
-}
-
-WallItem.prototype.setNext = function(item)
-{
-	this.next = item;
-	item.previous = this;
-
-	this.linkIfPossible(item);
-}
-
-WallItem.prototype.search = function(x, y, not_recursive)
-{
-	var res = null;
-	if (this.x == x && this.y == y)
-	{
-		res = this;
-	}
-	else if (!not_recursive && this.previous)
-	{
-		res = this.previous.search(x, y, not_recursive);
-	}
-	return res;
-}
-
-WallItem.prototype.linkIfPossible = function(item, not_recursive)
-{
-	if (this.y == item.y)
-	{
-		if (this.x == item.x + item.size)
-		{
-			this.left = item;
-			this.state |= WALL_W;
-			this.updateAnimationIndex();
-			item.right = this;
-			item.state |= WALL_E;
-			item.updateAnimationIndex();
-		}
-		else if (item.x == this.x + this.size)
-		{
-			item.left = this;
-			item.state |= WALL_W;
-			item.updateAnimationIndex();
-			this.right = item;
-			this.state |= WALL_E;
-			this.updateAnimationIndex();
-		}
-	}
-	else if (this.x == item.x)
-	{
-		if (this.y == item.y + item.size)
-		{
-			this.up = item;
-			this.state |= WALL_N;
-			this.updateAnimationIndex();
-			item.down = this;
-			item.state |= WALL_S;
-			item.updateAnimationIndex();
-		}
-		else if (item.y == this.y + this.size)
-		{
-			item.up = this;
-			item.state |= WALL_N;
-			item.updateAnimationIndex();
-			this.down = item;
-			this.state |= WALL_S;
-			this.updateAnimationIndex();
-		}
-	}
-
-	if (!not_recursive && this.previous)
-	{
-		this.previous.linkIfPossible(item, not_recursive);
-	}
-}
-
-WallItem.prototype.draw = function(ctx)
-{
-	this.sprite.draw(ctx);
-}
-*/
-
 function WallManager()
 {
 	this.size = World.get().tile_size;
-	this.wall_item = null;
+	this.wall_items = [];
 }
 
 WallManager.get = function()
@@ -172,26 +67,8 @@ WallManager.prototype.createWallItem = function(x, y, index)
 	var item = World.get().getTile(x, y);
 	item.setType(TYPE_WALL);
 	item.setIndex(index);
+	this.wall_items.push(item);
 	return item;
-
-	/*
-	var item = null;
-	if (this.wall_item)
-	{
-		item = this.wall_item.search(x, y);
-	}
-	if (!item)
-	{
-		item = new WallItem(x, y, index);
-		if (this.wall_item)
-		{
-			this.wall_item.setNext(item)
-		}
-		this.wall_item = item;
-		Screen.get().addItem(item, true);
-	}
-	return item;
-	*/
 }
 
 WallManager.prototype.addWall = function(index, x1, y1, x2, y2)
