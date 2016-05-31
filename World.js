@@ -137,14 +137,19 @@ WorldTile.prototype.draw = function(ctx)
 	this.sprite.draw(ctx);
 
 	// TODO debug only ------
-	ctx.beginPath();
-	ctx.moveTo(this.sprite.x, this.sprite.y);
-	ctx.lineTo(this.sprite.x + World.get().tile_size, this.sprite.y);
-	ctx.moveTo(this.sprite.x, this.sprite.y);
-	ctx.lineTo(this.sprite.x, this.sprite.y + World.get().tile_size);
-	ctx.strokeStyle="#FFFFFF";
-	ctx.closePath();
-	ctx.stroke();
+	if (document.getElementById("chk_grid").checked)
+	{
+		ctx.globalAlpha = 0.5;
+		ctx.beginPath();
+		ctx.strokeStyle="#FFFFFF";
+		ctx.moveTo(this.sprite.x, this.sprite.y);
+		ctx.lineTo(this.sprite.x + World.get().tile_size, this.sprite.y);
+		ctx.moveTo(this.sprite.x, this.sprite.y);
+		ctx.lineTo(this.sprite.x, this.sprite.y + World.get().tile_size);
+		ctx.closePath();
+		ctx.stroke();
+		ctx.globalAlpha = 1;
+	}
 	//-----------------------
 }
 
@@ -205,8 +210,8 @@ World.prototype.init = function(json)
 World.prototype.getTile = function(x, y)
 {
 	// TODO improve
-	var x2 = (x - this.start_x) / this.tile_size;
-	var y2 = (y - this.start_y) / this.tile_size;
+	var x2 = Math.round((x - this.start_x) / this.tile_size);
+	var y2 = Math.round((y - this.start_y) / this.tile_size);
 	var i = y2 * (this.w / this.tile_size) + x2;
 	return this.tiles[i];
 }

@@ -44,7 +44,7 @@
 				}
 				*/
 
-				generateMaze(3*32, 32, 13*32, 16*32);
+				generateMaze(3*32, 32, 13*32, 15*32);
 
 				/*
 				for (var i in json.player.creatures)
@@ -69,6 +69,11 @@
 
 			}
 
+			function update_screen()
+			{
+				Screen.get().setUpdateNeeded(true);
+			}
+
 			function action1()
 			{
 				var item = Screen.get().items[0];
@@ -78,7 +83,7 @@
 		</script>
 	</head>
 	<body>
-		<canvas id="screen" width=1024 height=512 style="border : 1px solid #000000;"></canvas>
+		<canvas id="screen" width=1024 height=480 style="border : 1px solid #000000;"></canvas>
 		<br />
 		<select id="action">
 			<option value="default">Default</option>
@@ -87,6 +92,15 @@
 			<option value="create_wall2">Create Wall 2</option>
 			<option value="find_path">Find path</option>
 		</select>
+		<br />
+		<table>
+			<tr>
+				<td><input type="checkbox" id="chk_grid" checked onchange="update_screen()"/> Grid</td>
+				<td><input type="checkbox" id="chk_blocks" checked onchange="update_screen()"/> Blocks</td>
+				<td><input type="checkbox" id="chk_path" checked onchange="update_screen()"/> Path</td>
+				<td><input type="checkbox" id="chk_path_analysis" checked onchange="update_screen()"/> Path Analysis</td>
+			</tr>
+		</table>
 		<br />
 		<button onClick="action1()">action1</button>
 		<script type="text/javascript">

@@ -32,7 +32,7 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 	Screen.get().debug_items = []; // TODO debug only
 	var res = [];
 
-	console.debug("path to", x1, x2, y1, y2);
+	console.debug("path from", x1, y1, "to", x2, y2);
 
 	var start_tile = World.get().getTile(x1, y1);
 	start_tile.current_path_parent = null;
@@ -93,42 +93,48 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 
 	res = this.simplifyPath(res);
 
-	/*
 	// TODO debug only --------------------
 	Screen.get().debug_items.push(function(ctx) {
-		colors = chroma.interpolate.bezier(["blue", "red"]);
-		cs = chroma.scale(colors).mode('lab').correctLightness(true);
-		cols = [];
-		var steps = nodes[nodes.length - 1].current_path_val;
-		for (var i = 0; i < steps; ++i)
+		if (document.getElementById("chk_path_analysis").checked)
 		{
-			var t = i / (steps - 1);
-			cols.push(cs(t).hex());
-		}
+			colors = chroma.interpolate.bezier(["blue", "red"]);
+			cs = chroma.scale(colors).mode('lab').correctLightness(true);
+			cols = [];
+			var steps = nodes[nodes.length - 1].current_path_val;
+			for (var i = 0; i < steps; ++i)
+			{
+				var t = i / (steps - 1);
+				cols.push(cs(t).hex());
+			}
 
-		for (var i in nodes)
-		{
-			ctx.fillStyle = cols[nodes[i].current_path_val];
-			ctx.fillRect(nodes[i].x + 1 - 16, nodes[i].y + 1 - 16, 30, 30);
+			ctx.globalAlpha = 0.45;
+			for (var i in nodes)
+			{
+				ctx.fillStyle = cols[nodes[i].current_path_val];
+				ctx.fillRect(nodes[i].x - 16, nodes[i].y - 16, 32, 32);
+			}
+			ctx.globalAlpha = 1;
 		}
 	});
 
 	Screen.get().setUpdateNeeded(true);
 	//-------------
-	*/
 
 	// TODO debug only --------------------
 	Screen.get().debug_items.push(function(ctx) {
-		ctx.beginPath();
-		ctx.strokeStyle="#00FF00";
-		ctx.moveTo(x1, y1);
-		for (var i in res)
+		if (document.getElementById("chk_path").checked)
 		{
-			ctx.lineTo(res[i].x, res[i].y);
-			ctx.moveTo(res[i].x, res[i].y);
+			ctx.beginPath();
+			ctx.strokeStyle="#00FF00";
+			ctx.moveTo(x1, y1);
+			for (var i in res)
+			{
+				ctx.lineTo(res[i].x, res[i].y);
+				ctx.moveTo(res[i].x, res[i].y);
+			}
+			ctx.closePath();
+			ctx.stroke();
 		}
-		ctx.closePath();
-		ctx.stroke();
 	});
 
 	Screen.get().setUpdateNeeded(true);
@@ -213,30 +219,6 @@ PathFinder.prototype.update = function()
 		}
 	}
 
-	/*
-	// TODO debug only --------------------
-	Screen.get().debug_items.push(function(ctx) {
-		//ctx.fillStyle="#FFFF00";
-		ctx.strokeStyle="#FFFF00";
-		ctx.beginPath();
-		for (var i in blocks)
-		{
-			ctx.moveTo(blocks[i][LEFT], blocks[i][UP]);
-			ctx.lineTo(blocks[i][LEFT], blocks[i][DOWN]);
-			ctx.lineTo(blocks[i][RIGHT], blocks[i][DOWN]);
-			ctx.lineTo(blocks[i][RIGHT], blocks[i][UP]);
-			ctx.lineTo(blocks[i][LEFT], blocks[i][UP]);
-			ctx.lineTo(blocks[i][RIGHT], blocks[i][DOWN]);
-			ctx.moveTo(blocks[i][RIGHT], blocks[i][UP]);
-			ctx.lineTo(blocks[i][LEFT], blocks[i][DOWN]);
-		}
-		ctx.closePath();
-		ctx.stroke();
-	});
-	Screen.get().setUpdateNeeded(true);
-	//-------------
-	*/
-
 	this.block_lines= [];
 	for (var i in blocks)
 	{
@@ -246,10 +228,34 @@ PathFinder.prototype.update = function()
 		this.block_lines.push(new Line(blk[RIGHT], blk[DOWN], blk[LEFT], blk[DOWN]));
 		this.block_lines.push(new Line(blk[LEFT], blk[DOWN], blk[LEFT], blk[UP]));
 	}
+	//
+	// TODO debug only --------------------
+	Screen.get().debug_items.push(function(ctx) {
+		if (document.getElementById("chk_blocks").checked)
+		{
+			ctx.fillStyle="#FFFF00";
+			for (var i in blocks)
+			{
+				ctx.globalAlpha = 0.25;
+				var x1 = Math.min(blocks[i][LEFT], blocks[i][RIGHT]);
+				var x2 = Math.max(blocks[i][LEFT], blocks[i][RIGHT]);
+				var y1 = Math.min(blocks[i][UP], blocks[i][DOWN]);
+				var y2 = Math.max(blocks[i][UP], blocks[i][DOWN]);
+				ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+				ctx.globalAlpha = 1;
+			}
+		}
+	});
+
+	Screen.get().setUpdateNeeded(true);
+	//-------------
+
 }
 
 PathFinder.prototype.simplifyPath = function(tiles)
 {
+	this.update(); //TODO debug only (to display debug colors)
+
 	var res = [tiles[0]];
 	var line_to_test;
 	for (var i  = 0; i < tiles.length - 1;)
