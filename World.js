@@ -1,9 +1,59 @@
-TYPE_NORMAL = 0x0;
-TYPE_WATER  = 0x1;
-TYPE_WALL   = 0x2;
-TYPE_ROAD   = 0x4;
+TYPE_NORMAL = 0x00;
+TYPE_WATER  = 0x01;
+TYPE_WALL1  = 0x02;
+TYPE_WALL2  = 0x04;
+TYPE_ROAD1  = 0x08;
+TYPE_ROAD2  = 0x10;
 
-function WorldTile(x, y, img_file, index, sub_index, ground_speed)
+GROUND_SPEEDS = {
+	0x00 : 4,
+	0x08 : 2,
+	0x10 : 1
+};
+
+N = 0x1;
+S = 0x2;
+E = 0x4;
+W = 0x8;
+WALL_MAPPING = {
+	0b0000 : [0],
+	0b0001 : [4],
+	0b0010 : [1],
+	0b0011 : [5, 6],
+	0b0100 : [2],
+	0b0101 : [7],
+	0b0110 : [3],
+	0b0111 : [8],
+	0b1000 : [9],
+	0b1001 : [14],
+	0b1010 : [10],
+	0b1011 : [15],
+	0b1100 : [11, 12],
+	0b1101 : [16],
+	0b1110 : [13],
+	0b1111 : [17]
+};
+
+ROAD_MAPPING = {
+	0b0000 : [0, 1],
+	0b0001 : [5],
+	0b0010 : [4],
+	0b0011 : [0, 1],
+	0b0100 : [2],
+	0b0101 : [0, 1],
+	0b0110 : [0, 1],
+	0b0111 : [0, 1],
+	0b1000 : [3],
+	0b1001 : [0, 1],
+	0b1010 : [0, 1],
+	0b1011 : [0, 1],
+	0b1100 : [0, 1],
+	0b1101 : [0, 1],
+	0b1110 : [0, 1],
+	0b1111 : [0, 1]
+};
+
+function WorldTile(x, y, img_file, index, sub_index, type)
 {
 	GraphicItem.call(this, x, y, img_file);
 	this.x = x;
@@ -14,22 +64,50 @@ function WorldTile(x, y, img_file, index, sub_index, ground_speed)
 	this.right = null;
 	this.up = null;
 	this.down = null;
-	this.ground_speed = ground_speed;
+	this.type = null;
+	this.ground_speed = 0;
 
-	this.type = TYPE_NORMAL;
+	this.wall_sprite = new Sprite(img_file);
+	this.wall_sprite.x = this.sprite.x;
+	this.wall_sprite.y = this.sprite.y;
+
+	this.road_sprite = new Sprite("images/roads.png");
+	this.road_sprite.x = this.sprite.x;
+	this.road_sprite.y = this.sprite.y;
 
 	this.current_path_parent = null;
 	this.current_path_id = 0;
 	this.current_path_best = null;
 	this.current_path_val = 0;
+
+	this.setType(type);
 }
 extend(GraphicItem, WorldTile);
 
 WorldTile.prototype.setType = function(type)
 {
-	if ((type & this.type) == 0)
+	if (type != this.type)
 	{
 		this.type = type;
+		this.ground_speed = GROUND_SPEEDS[this.type];
+
+		if (this.type == TYPE_WALL1)
+		{
+			this.wall_sprite.setIndex(10);
+		}
+		else if (this.type == TYPE_WALL2)
+		{
+			this.wall_sprite.setIndex(11);
+		}
+		else if (this.type == TYPE_ROAD1)
+		{
+			this.road_sprite.setIndex(0);
+		}
+		else if (this.type == TYPE_ROAD2)
+		{
+			this.road_sprite.setIndex(1);
+		}
+
 		this._updated();
 		this._updateNeightboors();
 	}
@@ -82,11 +160,47 @@ WorldTile.prototype._updateNeightboors = function()
 	}
 }
 
+WorldTile.prototype.chooseIndex = function()
+{
+	var state = 0;
+	if (this.left && (this.left.type == this.type))
+	{
+		state |= W;
+	}
+	if (this.right && (this.right.type == this.type))
+	{
+		state |= E;
+	}
+	if (this.up && (this.up.type == this.type))
+	{
+		state |= N;
+	}
+	if (this.down && (this.down.type == this.type))
+	{
+		state |= S;
+	}
+	var indexes;
+	if (this.type == TYPE_WALL1 || this.type == TYPE_WALL2)
+	{
+		indexes = WALL_MAPPING[state];
+	}
+	else if (this.type == TYPE_ROAD1 || this.type == TYPE_ROAD2)
+	{
+		indexes = ROAD_MAPPING[state];
+	}
+	var i = Math.floor((Math.random() * indexes.length));
+	return indexes[i];
+}
+
 WorldTile.prototype._updated = function()
 {
-	if (this.type & TYPE_WALL)
+	if (this.type == TYPE_WALL1 || this.type == TYPE_WALL2)
 	{
-		this.setSubIndex(chooseWallIndex(this));
+		this.wall_sprite.animation_index = this.chooseIndex();
+	}
+	else if (this.type == TYPE_ROAD1 || this.type == TYPE_ROAD2)
+	{
+		this.road_sprite.animation_index = this.chooseIndex();
 	}
 	// TODO do not update if not displayed
 	Screen.get().setUpdateNeeded(true);
@@ -134,8 +248,19 @@ WorldTile.prototype.linkDown = function(o_tile)
 
 WorldTile.prototype.draw = function(ctx)
 {
-	this.sprite.draw(ctx);
 
+	if (this.type == TYPE_WALL1 || this.type == TYPE_WALL2)
+	{
+		this.wall_sprite.draw(ctx);
+	}
+	else
+	{
+		this.sprite.draw(ctx);
+		if (this.type == TYPE_ROAD1 || this.type == TYPE_ROAD2)
+		{
+			this.road_sprite.draw(ctx);
+		}
+	}
 	// TODO debug only ------
 	if (document.getElementById("chk_grid").checked)
 	{

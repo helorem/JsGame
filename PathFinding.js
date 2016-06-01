@@ -34,12 +34,14 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 
 	console.debug("path from", x1, y1, "to", x2, y2);
 
+	var path_id = PathFinder.get().createPathId();
+
 	var start_tile = World.get().getTile(x1, y1);
 	start_tile.current_path_parent = null;
+	start_tile.current_path_id = path_id;
 	var end_tile = World.get().getTile(x2, y2);
 
 	var tile_list = [start_tile];
-	var path_id = PathFinder.get().createPathId();
 
 	var nodes = []; // TODO remove
 	while (tile_list.length > 0)
@@ -53,27 +55,45 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 		}
 		else
 		{
-			tile.current_path_id = path_id;
-
-			nodes.push(tile); // TODO remove
+			// TODO remove
+			if (nodes.indexOf(tile) == -1)
+			{
+				nodes.push(tile);
+			}
 
 			var childs = [tile.left, tile.right, tile.up, tile.down];
+			var child_path_val = tile.current_path_val + tile.ground_speed;
 
 			for (var i in childs)
 			{
 				var child = childs[i];
 				if (child)
 				{
-					if ((child.type & TYPE_WATER) | (child.type & TYPE_WALL))
+					if (child.type == TYPE_WATER || child.type == TYPE_WALL1 || child.type == TYPE_WALL2)
 					{
 						// we cannot walk on the tile
 					}
-					else if (child.current_path_id != path_id)
+					else if (child.current_path_id != path_id || child_path_val < child.current_path_val)
 					{
 						child.current_path_id = path_id;
 						child.current_path_parent = tile;
-						child.current_path_val = tile.current_path_val + tile.ground_speed;
-						tile_list.push(child);
+						child.current_path_val = child_path_val;
+
+						//insert sorted
+						var inserted = false;
+						for (var j in tile_list)
+						{
+							if (tile_list[j].current_path_val > child.current_path_val)
+							{
+								tile_list.splice(j, 0, child);
+								inserted = true;
+								break;
+							}
+						}
+						if (!inserted)
+						{
+							tile_list.push(child);
+						}
 					}
 				}
 			}
@@ -91,15 +111,15 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 		tile = tile.current_path_best;
 	}
 
-	res = this.simplifyPath(res);
+	//res = this.simplifyPath(res);
 
 	// TODO debug only --------------------
 	Screen.get().debug_items.push(function(ctx) {
 		if (document.getElementById("chk_path_analysis").checked)
 		{
-			colors = chroma.interpolate.bezier(["blue", "red"]);
-			cs = chroma.scale(colors).mode('lab').correctLightness(true);
-			cols = [];
+			var colors = chroma.interpolate.bezier(["blue", "red"]);
+			var cs = chroma.scale(colors).mode('lab').correctLightness(true);
+			var cols = [];
 			var steps = nodes[nodes.length - 1].current_path_val;
 			for (var i = 0; i < steps; ++i)
 			{
@@ -107,7 +127,7 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 				cols.push(cs(t).hex());
 			}
 
-			ctx.globalAlpha = 0.45;
+			ctx.globalAlpha = 0.60;
 			for (var i in nodes)
 			{
 				ctx.fillStyle = cols[nodes[i].current_path_val];
@@ -155,7 +175,7 @@ PathFinder.prototype.update = function()
 		var last_tile = tile;
 		while (tile)
 		{
-			if (tile.type & (TYPE_WALL | TYPE_WATER))
+			if (tile.type == TYPE_WALL1 || tile.type == TYPE_WALL2 || tile.type == TYPE_WATER)
 			{
 				if (!start_block)
 				{
@@ -191,7 +211,7 @@ PathFinder.prototype.update = function()
 		var last_tile = null;
 		while (tile)
 		{
-			if (tile.type & (TYPE_WALL | TYPE_WATER))
+			if (tile.type == TYPE_WALL1 || tile.type == TYPE_WALL2 || tile.type == TYPE_WATER)
 			{
 				if (!start_block)
 				{

@@ -22,7 +22,7 @@ WALL_MAPPING = {
 	0b1110 : [13],
 	0b1111 : [17],
 };
-
+/*
 function chooseWallIndex(tile)
 {
 	var state = 0;
@@ -46,7 +46,7 @@ function chooseWallIndex(tile)
 	var i = Math.floor((Math.random() * indexes.length));
 	return indexes[i];
 }
-
+*/
 function WallManager()
 {
 	this.size = World.get().tile_size;
@@ -65,8 +65,15 @@ WallManager.get = function()
 WallManager.prototype.createWallItem = function(x, y, index)
 {
 	var item = World.get().getTile(x, y);
-	item.setType(TYPE_WALL);
-	item.setIndex(index);
+	if (index == 10)
+	{
+		item.setType(TYPE_WALL1);
+	}
+	else
+	{
+		item.setType(TYPE_WALL2);
+	}
+	//item.setIndex(index);
 	this.wall_items.push(item);
 	return item;
 }
@@ -119,6 +126,45 @@ WallManager.prototype.addWall = function(index, x1, y1, x2, y2)
 		}
 	}
 	this.createWallItem(x, y, index);
+	PathFinder.get().update();
+}
+
+function createTileLine(type, x1, y1, x2, y2)
+{
+	var tmp;
+	if (x1 > x2)
+	{
+		tmp = x1;
+		x1 = x2;
+		x2 = tmp;
+	}
+
+	if (y1 > y2)
+	{
+		tmp = y1;
+		y1 = y2;
+		y2 = tmp;
+	}
+
+	var x = x1;
+	var y = y1;
+	while (x < x2 || y < y2)
+	{
+		var tile = World.get().getTile(x, y);
+		tile.setType(type);
+
+		if (x < x2)
+		{
+			x += World.get().tile_size;
+		}
+
+		if (y < y2)
+		{
+			y += World.get().tile_size;
+		}
+	}
+	var tile = World.get().getTile(x, y);
+	tile.setType(type);
 	PathFinder.get().update();
 }
 

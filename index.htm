@@ -25,7 +25,9 @@
 				"images/scrub.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 78, "h" : 114, "total_w" : 624, "total_h" : 1368, "orientation" : "v", "selection_size" : 32, "animation" : [
 					12, 12, 12, 12, 12, 12, 12, 12]},
 				"images/steppe.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 32, "h" : 32, "total_w" : 320, "total_h" : 992, "orientation" : "h", "selection_size" : 32, "animation" : [
-					16,	4, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 16, 16, 16, 16, 20, 4, 5, 16]}
+					16,	4, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 16, 16, 16, 16, 20, 4, 5, 16]},
+				"images/roads.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 32, "h" : 32, "total_w" : 192, "total_h" : 64, "orientation" : "h", "selection_size" : 32, "animation" : [
+					6, 6]}
 			};
 
 			function start(json)
@@ -44,7 +46,17 @@
 				}
 				*/
 
-				generateMaze(3*32, 32, 13*32, 15*32);
+				//generateMaze(3*32, 32, 13*32, 15*32);
+
+				createTileLine(TYPE_WALL1, 2*32, 2*32, 5*32, 2*32);
+				createTileLine(TYPE_WALL2, 2*32, 4*32, 5*32, 4*32);
+				createTileLine(TYPE_ROAD1, 2*32, 6*32, 5*32, 6*32);
+				createTileLine(TYPE_ROAD2, 2*32, 8*32, 13*32, 8*32);
+
+				createTileLine(TYPE_WALL1, 7*32,  2*32, 7*32,  5*32);
+				createTileLine(TYPE_WALL2, 9*32,  2*32, 9*32,  5*32);
+				createTileLine(TYPE_ROAD1, 11*32, 2*32, 11*32, 5*32);
+				createTileLine(TYPE_ROAD2, 13*32, 2*32, 13*32, 5*32);
 
 				/*
 				for (var i in json.player.creatures)
@@ -62,7 +74,8 @@
 				var y2 = 5*32 + 16;
 				Screen.get().addItem(new Creature(x2, y2, "images/scrub.png"));
 
-				Screen.get().items[1].findPath(x1, y1);
+				//Screen.get().items[1].findPath(x1, y1);
+				Screen.get().items[0].findPath(156, 240);
 
 				Screen.get().looping = true;
 				Screen.get().loop();
