@@ -111,8 +111,6 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 		tile = tile.current_path_best;
 	}
 
-	//res = this.simplifyPath(res);
-
 	// TODO debug only --------------------
 	Screen.get().debug_items.push(function(ctx) {
 		if (document.getElementById("chk_path_analysis").checked)
@@ -145,7 +143,7 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 		if (document.getElementById("chk_path").checked)
 		{
 			ctx.beginPath();
-			ctx.strokeStyle="#00FF00";
+			ctx.strokeStyle="#00FFFF";
 			ctx.moveTo(x1, y1);
 			for (var i in res)
 			{
@@ -161,6 +159,11 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 	//-------------
 }
 
+PathFinder.prototype.update = function()
+{
+}
+
+/*
 PathFinder.prototype.update = function()
 {
 	blocks = [];
@@ -272,6 +275,95 @@ PathFinder.prototype.update = function()
 
 }
 
+function getLineCost(line)
+{
+	var res = [];
+
+	var tile_contains = function(tile, x, y)
+	{
+		var padding =  World.get().tile_size / 2;
+		if (x < tile.x - padding || x > tile.x + padding || y < tile.y - padding || y > tile.y + padding)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	var tile_intersect = function(tile, line)
+	{
+		var padding =  World.get().tile_size / 2;
+		var tile_lines = [];
+		tile_lines.push(new Line(tile.x - padding, tile.y - padding, tile.x + padding, tile.y - padding));
+		tile_lines.push(new Line(tile.x + padding, tile.y - padding, tile.x + padding, tile.y + padding));
+		tile_lines.push(new Line(tile.x + padding, tile.y + padding, tile.x - padding, tile.y + padding));
+		tile_lines.push(new Line(tile.x + padding, tile.y + padding, tile.x - padding, tile.y - padding));
+
+		var points = [];
+		for (var i in tile_lines)
+		{
+			var pt = tile_lines[i].intersect(line);
+			if (pt)
+			{
+				points.push(pt);
+			}
+		}
+		if (points.length == 0)
+		{
+			return false;
+		}
+		else if (points.length < 2)
+		{
+			//the segment end in the tile
+			if (tile_contains(tile, line.x1, line.y1))
+			{
+				points.push([line.x1, line.y1]);
+			}
+			else
+			{
+				points.push([line.x2, line.y2]);
+			}
+		}
+
+		var A = points[1][0] - points[0][0];
+		var B = points[1][1] - points[0][1];
+		var res = Math.sqrt(A * A + B * B);
+		return res;
+	}
+
+	x1 = Math.min(line.x1, line.x2);
+	x2 = Math.max(line.x1, line.x2);
+	y1 = Math.min(line.y1, line.y2);
+	y2 = Math.max(line.y1, line.y2);
+
+	var tile_list = [World.get().getTile(x1, y1)];
+	var total_cost = 0;
+	while (tile_list.length > 0)
+	{
+		var tile = tile_list.shift();
+		var line_length = tile_intersect(tile, line);
+		if (line_length)
+		{
+			console.debug(tile.x, tile.y, tile.type);
+			if (tile.type == TYPE_WATER || tile.type == TYPE_WALL1 || tile.type == TYPE_WALL2)
+			{
+				console.debug("wrong");
+				return -1;
+			}
+
+			total_cost += (line_length * tile.ground_speed) / World.get().tile_size;
+			if (tile.right)
+			{
+				tile_list.push(tile.right);
+			}
+			if (tile.down)
+			{
+				tile_list.push(tile.down);
+			}
+		}
+	}
+	return Math.round(total_cost);
+}
+
 PathFinder.prototype.simplifyPath = function(tiles)
 {
 	this.update(); //TODO debug only (to display debug colors)
@@ -280,24 +372,26 @@ PathFinder.prototype.simplifyPath = function(tiles)
 	var line_to_test;
 	for (var i  = 0; i < tiles.length - 1;)
 	{
+		var found = false;
 		for (var j = tiles.length - 1; j > i; --j)
 		{
 			line_to_test = new Line(tiles[i].x, tiles[i].y, tiles[j].x, tiles[j].y);
-			found = false;
-			for (var k in this.block_lines)
+			var cost = getLineCost(line_to_test);
+			if (cost > -1)
 			{
-				if (this.block_lines[k].intersect(line_to_test))
+				if (tiles[i].current_path_val + cost <= tiles[j].current_path_val)
 				{
+					console.debug(tiles[j].x, tiles[j].x);
+					res.push(tiles[j]);
 					found = true;
+					i = j;
 					break;
 				}
 			}
-			if (!found)
-			{
-				res.push(tiles[j]);
-				i = j;
-				break;
-			}
+		}
+		if (!found)
+		{
+			i += 1;
 		}
 	}
 
@@ -336,7 +430,7 @@ Line.prototype.intersect = function(line)
 	else if (yi > Math.max(this.y1, this.y2)) return false;
 	else if (yi < Math.min(line.y1, line.y2)) return false;
 	else if (yi > Math.max(line.y1, line.y2)) return false;
-	else return true;
+	else return [xi, yi];
 	//point = xi, yi
 }
-
+*/
