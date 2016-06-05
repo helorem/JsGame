@@ -29,7 +29,6 @@ PathFinder.prototype.createPathId = function()
 
 PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 {
-	Screen.get().debug_items = []; // TODO debug only
 	var res = [];
 
 	var path_id = PathFinder.get().createPathId();
@@ -111,7 +110,7 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 	}
 
 	// TODO debug only --------------------
-	Screen.get().debug_items.push(function(ctx) {
+	Screen.get().debug_items["path_analysis"] = function(ctx) {
 		if (document.getElementById("chk_path_analysis").checked)
 		{
 			var colors = chroma.interpolate.bezier(["blue", "red"]);
@@ -132,13 +131,13 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 			}
 			ctx.globalAlpha = 1;
 		}
-	});
+	};
 
 	Screen.get().setUpdateNeeded(true);
 	//-------------
 
 	// TODO debug only --------------------
-	Screen.get().debug_items.push(function(ctx) {
+	Screen.get().debug_items["path"] = function(ctx) {
 		if (document.getElementById("chk_path").checked)
 		{
 			if (res.length > 1)
@@ -155,7 +154,7 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 				ctx.stroke();
 			}
 		}
-	});
+	};
 
 	Screen.get().setUpdateNeeded(true);
 	//-------------

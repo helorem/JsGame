@@ -66,7 +66,24 @@ function PhysicItem(x, y, img_file)
 	GraphicItem.call(this, x, y, img_file);
 	this.collision_type = COLLISION_CIRCLE;
 	this.square = [0, 0, 0, 0];
-	this.circle = [0, 0, this.selection_size];
+	this.circle = [0, 0, this.selection_size / 2];
+
+	// TODO debug only --------------------
+	var me = this;
+	Screen.get().debug_items["collision" + Screen.get().items.length] = function(ctx) {
+		if (document.getElementById("chk_collision").checked)
+		{
+			ctx.beginPath();
+			ctx.strokeStyle = "#FFFF00";
+			ctx.arc(me.circle[0], me.circle[1], me.circle[2], 0, 2*Math.PI);
+			ctx.closePath();
+			ctx.stroke();
+		}
+	};
+
+	Screen.get().setUpdateNeeded(true);
+	//-------------
+
 
 	this.calcShapes();
 }

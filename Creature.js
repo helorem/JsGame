@@ -158,10 +158,9 @@ Creature.prototype.update = function(timestamp)
 			}
 
 			//Collision
-			/*
 			var collision = false;
 			this.calcShapes();
-			console.debug("test collision", this.x, this.y, this.selection_size, this.square);
+			//console.debug("test collision", this.x, this.y, this.selection_size, this.square);
 			var item;
 			var items = Screen.get().background_items;
 			for (var i in items)
@@ -197,12 +196,11 @@ Creature.prototype.update = function(timestamp)
 			}
 			else
 			{
-			*/
-			this.steps["count"] -= 1;
-			var res = this.sprite.setPosition(this.x, this.y);
-			this.x = res[0];
-			this.y = res[1];
-			//}
+				this.steps["count"] -= 1;
+				var res = this.sprite.setPosition(this.x, this.y);
+				this.x = res[0];
+				this.y = res[1];
+			}
 
 			if (this.steps["count"] < 0)
 			{

@@ -22,20 +22,22 @@
 								   (Math.sin(Math.radians(67.5)) / Math.cos(Math.radians(67.5)))];
 
 			var g_images = {
-				"images/scrub.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 78, "h" : 114, "total_w" : 624, "total_h" : 1368, "orientation" : "v", "selection_size" : 32, "animation" : [
+				"images/scrub.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 78, "h" : 114, "total_w" : 624, "total_h" : 1368, "orientation" : "v", "selection_size" : 30, "animation" : [
 					12, 12, 12, 12, 12, 12, 12, 12]},
 				"images/steppe.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 32, "h" : 32, "total_w" : 320, "total_h" : 992, "orientation" : "h", "selection_size" : 32, "animation" : [
 					16,	4, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 16, 16, 16, 16, 20, 4, 5, 16]},
 				"images/roads.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 32, "h" : 32, "total_w" : 192, "total_h" : 64, "orientation" : "h", "selection_size" : 32, "animation" : [
-					6, 6]}
+					6, 6]},
+				"images/house.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 96, "h" : 96, "total_w" : 384, "total_h" : 96, "orientation" : "h", "selection_size" : 90, "animation" : [
+					2, 2]},
 			};
 
 			function start(json)
 			{
 				var canvas = document.getElementById("screen");
 				var ctx = canvas.getContext("2d");
-				World.get().init(json);
 				Screen.get().init(ctx, canvas.width, canvas.height);
+				World.get().init(json);
 				ControlManager.get().init(canvas, document.getElementById("action"));
 
 				/*
@@ -74,6 +76,10 @@
 				var y2 = 5*32 + 16;
 				Screen.get().addItem(new Creature(x2, y2, "images/scrub.png"));
 
+				x2 = 22*32 + 16;
+				y2 = 5*32 + 16;
+				Screen.get().addItem(new PhysicItem(x2, y2, "images/house.png"));
+
 				//Screen.get().items[1].findPath(x1, y1);
 				Screen.get().items[0].moveOnPathTo(467, 336);
 
@@ -109,9 +115,9 @@
 		<table>
 			<tr>
 				<td><input type="checkbox" id="chk_grid" checked onchange="update_screen()"/> Grid</td>
-				<td><input type="checkbox" id="chk_blocks" checked onchange="update_screen()"/> Blocks</td>
 				<td><input type="checkbox" id="chk_path" checked onchange="update_screen()"/> Path</td>
 				<td><input type="checkbox" id="chk_path_analysis" checked onchange="update_screen()"/> Path Analysis</td>
+				<td><input type="checkbox" id="chk_collision" checked onchange="update_screen()"/> Collision</td>
 			</tr>
 		</table>
 		<br />

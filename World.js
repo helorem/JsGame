@@ -80,6 +80,25 @@ function WorldTile(x, y, img_file, index, sub_index, type)
 	this.current_path_best = null;
 	this.current_path_val = 0;
 
+	// TODO debug only ------
+	var me = this;
+	Screen.get().debug_items["tile" + this.x + "x" + this.y] = function(ctx) {
+		if (document.getElementById("chk_grid").checked)
+		{
+			ctx.globalAlpha = 0.5;
+			ctx.beginPath();
+			ctx.strokeStyle="#FFFFFF";
+			ctx.moveTo(me.sprite.x, me.sprite.y);
+			ctx.lineTo(me.sprite.x + World.get().tile_size, me.sprite.y);
+			ctx.moveTo(me.sprite.x, me.sprite.y);
+			ctx.lineTo(me.sprite.x, me.sprite.y + World.get().tile_size);
+			ctx.closePath();
+			ctx.stroke();
+			ctx.globalAlpha = 1;
+		}
+	};
+	//-----------------------
+
 	this.setType(type);
 }
 extend(GraphicItem, WorldTile);
@@ -255,27 +274,12 @@ WorldTile.prototype.draw = function(ctx)
 	}
 	else
 	{
-		this.sprite.draw(ctx);
+		GraphicItem.prototype.draw.call(this, ctx);
 		if (this.type == TYPE_ROAD1 || this.type == TYPE_ROAD2)
 		{
 			this.road_sprite.draw(ctx);
 		}
 	}
-	// TODO debug only ------
-	if (document.getElementById("chk_grid").checked)
-	{
-		ctx.globalAlpha = 0.5;
-		ctx.beginPath();
-		ctx.strokeStyle="#FFFFFF";
-		ctx.moveTo(this.sprite.x, this.sprite.y);
-		ctx.lineTo(this.sprite.x + World.get().tile_size, this.sprite.y);
-		ctx.moveTo(this.sprite.x, this.sprite.y);
-		ctx.lineTo(this.sprite.x, this.sprite.y + World.get().tile_size);
-		ctx.closePath();
-		ctx.stroke();
-		ctx.globalAlpha = 1;
-	}
-	//-----------------------
 }
 
 

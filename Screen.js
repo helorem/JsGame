@@ -22,7 +22,7 @@ Screen.prototype.init = function(ctx, w, h)
 	this.background_items = [];
 	this.selected_items = [];
 
-	this.debug_items = []; //TODO for debug
+	this.debug_items = {}; //TODO for debug
 
 	this.setUpdateNeeded(true);
 }
