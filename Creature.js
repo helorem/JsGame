@@ -1,9 +1,12 @@
+CREATURE_ANIM_WALK = [[0, 1, 2, 1], 200];
+
 function Creature(x, y, img_file)
 {
 	PhysicItem.call(this, x, y, img_file);
 
 	this.direction = 0;
 	this.steps = null;
+	this.path = null;
 }
 extend(PhysicItem, Creature);
 
@@ -24,13 +27,14 @@ Creature.prototype.turn = function(mod)
 	new_dir %= DIRECTIONS.length;
 	this.setDirection(DIRECTIONS[new_dir]);
 }
-
+/*
 Creature.prototype.findPath = function(dst_x, dst_y)
 {
 	PathFinder.get().findPath(this.x, this.y, dst_x, dst_y);
 }
+*/
 
-Creature.prototype.moveTo = function(x, y, callback)
+Creature.prototype.moveTo = function(x, y, callback, ignore_anim)
 {
 	var vec_x = x - this.x;
 	var vec_y = y - this.y;
@@ -86,8 +90,11 @@ Creature.prototype.moveTo = function(x, y, callback)
 	}
 	this.setDirection(dir);
 
-	this.sprite.startAnimation([0, 1, 2, 1], 200); // TODO variable
-	this.steps = {"step_x" : step_x, "step_y" : step_y, "count" : step_count, "x" : x, "y" : y, "speed" : speed, "timestamp" : 0, "callback" : callback};
+	if (!ignore_anim)
+	{
+		this.sprite.startAnimation(CREATURE_ANIM_WALK[0], CREATURE_ANIM_WALK[1]);
+	}
+	this.steps = {"step_x" : step_x, "step_y" : step_y, "count" : step_count, "x" : x, "y" : y, "speed" : speed, "timestamp" : 0, "callback" : callback, "ignore_anim" : ignore_anim};
 }
 
 Creature.prototype.move = function(vec_x, vec_y, callback)
@@ -95,6 +102,37 @@ Creature.prototype.move = function(vec_x, vec_y, callback)
 	var x = this.x + vec_x;
 	var y = this.y + vec_y;
 	this.moveTo(x, y, callback);
+}
+
+Creature.prototype.moveOnPathTo = function(x, y, callback)
+{
+	var checkpoints = PathFinder.get().findPath(this.x, this.y, x, y);
+	this.path = {"checkpoints" : checkpoints, "on_finished" : callback};
+	this.sprite.startAnimation(CREATURE_ANIM_WALK[0], CREATURE_ANIM_WALK[1]);
+	Creature._followPath(this);
+}
+
+Creature._followPath = function(item)
+{
+	if (item.path)
+	{
+		var cp = item.path["checkpoints"].shift();
+		if (!cp)
+		{
+			// end reached
+			item.sprite.stopAnimation();
+			var cb = item.path["on_finished"];
+			item.path = null;
+			if (cb)
+			{
+				cb(this);
+			}
+		}
+		else
+		{
+			item.moveTo(cp.x, cp.y, Creature._followPath, true);
+		}
+	}
 }
 
 Creature.prototype.update = function(timestamp)
@@ -109,7 +147,9 @@ Creature.prototype.update = function(timestamp)
 			{
 				this.x += this.steps["step_x"];
 				this.y += this.steps["step_y"];
-				this.steps["timestamp"] = timestamp + this.steps["speed"];
+				var tile = World.get().getTile(this.x, this.y); // TODO improve
+				this.sprite.setAnimationInterval(CREATURE_ANIM_WALK[1] * tile.ground_speed);
+				this.steps["timestamp"] = timestamp + (this.steps["speed"] * tile.ground_speed);
 			}
 			else
 			{
@@ -118,6 +158,7 @@ Creature.prototype.update = function(timestamp)
 			}
 
 			//Collision
+			/*
 			var collision = false;
 			this.calcShapes();
 			console.debug("test collision", this.x, this.y, this.selection_size, this.square);
@@ -156,25 +197,28 @@ Creature.prototype.update = function(timestamp)
 			}
 			else
 			{
-				this.steps["count"] -= 1;
-				var res = this.sprite.setPosition(this.x, this.y);
-				this.x = res[0];
-				this.y = res[1];
-			}
+			*/
+			this.steps["count"] -= 1;
+			var res = this.sprite.setPosition(this.x, this.y);
+			this.x = res[0];
+			this.y = res[1];
+			//}
 
 			if (this.steps["count"] < 0)
 			{
 				var callback = this.steps["callback"];
+				if (!this.steps["ignore_anim"])
+				{
+					this.sprite.stopAnimation();
+				}
 				this.steps = null;
-				this.sprite.stopAnimation();
 				if (callback)
 				{
-					callback();
+					callback(this);
 				}
 			}
 		}
 	}
 	GraphicItem.prototype.update.call(this, timestamp);
 }
-
 

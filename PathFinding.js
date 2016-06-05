@@ -32,13 +32,12 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 	Screen.get().debug_items = []; // TODO debug only
 	var res = [];
 
-	console.debug("path from", x1, y1, "to", x2, y2);
-
 	var path_id = PathFinder.get().createPathId();
 
 	var start_tile = World.get().getTile(x1, y1);
 	start_tile.current_path_parent = null;
 	start_tile.current_path_id = path_id;
+	start_tile.current_path_val = 0;
 	var end_tile = World.get().getTile(x2, y2);
 
 	var tile_list = [start_tile];
@@ -100,7 +99,7 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 		}
 	}
 
-	console.debug("nb tile analysed", nodes.length);
+	//console.debug("nb tile analysed", nodes.length);
 	nodes.shift();
 
 	var res = [];
@@ -142,21 +141,25 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 	Screen.get().debug_items.push(function(ctx) {
 		if (document.getElementById("chk_path").checked)
 		{
-			ctx.beginPath();
-			ctx.strokeStyle="#00FFFF";
-			ctx.moveTo(x1, y1);
-			for (var i in res)
+			if (res.length > 1)
 			{
-				ctx.lineTo(res[i].x, res[i].y);
-				ctx.moveTo(res[i].x, res[i].y);
+				ctx.beginPath();
+				ctx.strokeStyle="#00FFFF";
+				ctx.moveTo(res[0].x, res[0].y);
+				for (var i = 1; i < res.length; ++i)
+				{
+					ctx.lineTo(res[i].x, res[i].y);
+					ctx.moveTo(res[i].x, res[i].y);
+				}
+				ctx.closePath();
+				ctx.stroke();
 			}
-			ctx.closePath();
-			ctx.stroke();
 		}
 	});
 
 	Screen.get().setUpdateNeeded(true);
 	//-------------
+	return res;
 }
 
 PathFinder.prototype.update = function()

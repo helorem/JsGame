@@ -75,10 +75,17 @@ Sprite.prototype.startAnimation = function(anim, interval)
 	this.animation = {"anim" : anim, "index" : 0, "next_ts" : 0, "interval" : interval};
 }
 
+Sprite.prototype.setAnimationInterval = function(interval)
+{
+	if (this.animation)
+	{
+		this.animation["interval"] = interval;
+	}
+}
+
 Sprite.prototype.stopAnimation = function()
 {
 	this.animation = null;
 	this.animation_index = 0;
 }
-
 

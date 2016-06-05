@@ -150,7 +150,7 @@ ControlManager.prototype.onClick = function(cursor)
 				{
 					if (this.getMode() == "find_path")
 					{
-						items[i].findPath(x, y);
+						items[i].moveOnPathTo(x, y);
 					}
 					else
 					{
