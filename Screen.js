@@ -141,9 +141,10 @@ Screen.prototype.getItemAt = function(x, y)
 {
 	res = null;
 	var item;
+	var len = this.items.length - 1;
 	for (var i in this.items)
 	{
-		item = this.items[i];
+		item = this.items[len - i];
 		if (item.contains(x, y))
 		{
 			res = item;

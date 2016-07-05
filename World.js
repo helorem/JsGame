@@ -1,9 +1,10 @@
-TYPE_NORMAL = 0x00;
-TYPE_WATER  = 0x01;
-TYPE_WALL1  = 0x02;
-TYPE_WALL2  = 0x04;
-TYPE_ROAD1  = 0x08;
-TYPE_ROAD2  = 0x10;
+TYPE_NORMAL   = 0x00;
+TYPE_WATER    = 0x01;
+TYPE_WALL1    = 0x02;
+TYPE_WALL2    = 0x04;
+TYPE_ROAD1    = 0x08;
+TYPE_ROAD2    = 0x10;
+TYPE_BUILDING = 0x11;
 
 GROUND_SPEEDS = {
 	0x00 : 1,
@@ -95,6 +96,15 @@ function WorldTile(x, y, img_file, index, sub_index, type)
 			ctx.closePath();
 			ctx.stroke();
 			ctx.globalAlpha = 1;
+		}
+		if (document.getElementById("chk_mask").checked)
+		{
+			if (me.type == TYPE_WALL1 || me.type == TYPE_WALL2 || me.type == TYPE_BUILDING || me.type == TYPE_WATER)
+			{
+				ctx.globalAlpha = 0.5;
+				ctx.fillStyle = "#FFFF99";
+				ctx.fillRect(me.sprite.x, me.sprite.y, World.get().tile_size, World.get().tile_size);
+			}
 		}
 	};
 	//-----------------------

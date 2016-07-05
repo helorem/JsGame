@@ -129,13 +129,10 @@ ControlManager.prototype.onClick = function(cursor)
 	else
 	{
 		var item = Screen.get().getItemAt(x, y);
-		if (item)
+		if (item && button == BUTTON_LEFT)
 		{
-			if (button == BUTTON_LEFT)
-			{
-				Screen.get().unselectAll();
-				Screen.get().select(item);
-			}
+			Screen.get().unselectAll();
+			Screen.get().select(item);
 		}
 		else
 		{

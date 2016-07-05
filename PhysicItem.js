@@ -1,3 +1,4 @@
+COLLISION_NONE = 0;
 COLLISION_BOX = 1;
 COLLISION_CIRCLE = 2;
 
@@ -65,19 +66,27 @@ function PhysicItem(x, y, img_file)
 {
 	GraphicItem.call(this, x, y, img_file);
 	this.collision_type = COLLISION_CIRCLE;
+	var img = g_images[img_file];
+	this.collision_size = img["collision_size"];
 	this.square = [0, 0, 0, 0];
-	this.circle = [0, 0, this.selection_size / 2];
+	this.circle = [0, 0, this.collision_size / 2];
+
+	this.mask = null;
+	this.setMask(g_images[img_file]["mask"]);
 
 	// TODO debug only --------------------
 	var me = this;
-	Screen.get().debug_items["collision" + Screen.get().items.length] = function(ctx) {
+	Screen.get().debug_items["PhysicItem" + Screen.get().items.length] = function(ctx) {
 		if (document.getElementById("chk_collision").checked)
 		{
-			ctx.beginPath();
-			ctx.strokeStyle = "#FFFF00";
-			ctx.arc(me.circle[0], me.circle[1], me.circle[2], 0, 2*Math.PI);
-			ctx.closePath();
-			ctx.stroke();
+			if (me.collision_type == COLLISION_CIRCLE)
+			{
+				ctx.beginPath();
+				ctx.strokeStyle = "#FFFF00";
+				ctx.arc(me.circle[0], me.circle[1], me.circle[2], 0, 2*Math.PI);
+				ctx.closePath();
+				ctx.stroke();
+			}
 		}
 	};
 
@@ -89,12 +98,41 @@ function PhysicItem(x, y, img_file)
 }
 extend(GraphicItem, PhysicItem);
 
+PhysicItem.prototype.setCollisionType = function(collision_type)
+{
+	this.collision_type = collision_type;
+}
+
+PhysicItem.prototype.setMask = function(mask)
+{
+	this.mask = mask;
+	if (mask)
+	{
+		var x = 0;
+		var y = 0;
+		var size = World.get().tile_size;
+		for (var i in this.mask)
+		{
+			if (this.mask[i])
+			{
+				World.get().getTile(this.sprite.x + x, this.sprite.y + y).setType(TYPE_BUILDING)
+			}
+			x += size;
+			if (x >= this.sprite.w)
+			{
+				x = 0;
+				y += size;
+			}
+		}
+	}
+}
+
 PhysicItem.prototype.calcShapes = function()
 {
-	var left = this.x - (this.selection_size / 2);
-	var right = left + this.selection_size;
-	var up = this.y - (this.selection_size / 2);
-	var down = up + this.selection_size;
+	var left = this.x - (this.collision_size / 2);
+	var right = left + this.collision_size;
+	var up = this.y - (this.collision_size / 2);
+	var down = up + this.collision_size;
 	this.square[0] = left;
 	this.square[1] = right;
 	this.square[2] = up;
@@ -127,7 +165,11 @@ PhysicItem.prototype.getCollisionBox = function(item)
 PhysicItem.prototype.isColliding = function(other)
 {
 	res = false;
-	if (this.collision_type == COLLISION_CIRCLE)
+	if (this.collision_type == COLLISION_NONE || other.collision_type == COLLISION_NONE)
+	{
+		//no collision
+	}
+	else if (this.collision_type == COLLISION_CIRCLE)
 	{
 		res = testCircleCollision(this, other);
 	}
@@ -141,6 +183,16 @@ PhysicItem.prototype.isColliding = function(other)
 		res = (box[0] <= box[1] && box[2] <= box[3]);
 	}
 	return res;
+}
+
+PhysicItem.prototype.onCollision = function(item)
+{
+	// return if the collision is blocking
+	return true;
+}
+
+PhysicItem.prototype.onCollisionOver = function(item)
+{
 }
 
 /**

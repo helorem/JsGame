@@ -8,6 +8,7 @@
 		<script type="text/javascript" src="Sprite.js"></script>
 		<script type="text/javascript" src="GraphicItem.js"></script>
 		<script type="text/javascript" src="PhysicItem.js"></script>
+		<script type="text/javascript" src="Building.js"></script>
 		<script type="text/javascript" src="Creature.js"></script>
 		<script type="text/javascript" src="WallManager.js"></script>
 		<script type="text/javascript" src="Screen.js"></script>
@@ -22,14 +23,14 @@
 								   (Math.sin(Math.radians(67.5)) / Math.cos(Math.radians(67.5)))];
 
 			var g_images = {
-				"images/scrub.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 78, "h" : 114, "total_w" : 624, "total_h" : 1368, "orientation" : "v", "selection_size" : 30, "animation" : [
-					12, 12, 12, 12, 12, 12, 12, 12]},
-				"images/steppe.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 32, "h" : 32, "total_w" : 320, "total_h" : 992, "orientation" : "h", "selection_size" : 32, "animation" : [
-					16,	4, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 16, 16, 16, 16, 20, 4, 5, 16]},
-				"images/roads.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 32, "h" : 32, "total_w" : 192, "total_h" : 64, "orientation" : "h", "selection_size" : 32, "animation" : [
-					6, 6]},
-				"images/house.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 96, "h" : 96, "total_w" : 384, "total_h" : 96, "orientation" : "h", "selection_size" : 90, "animation" : [
-					2, 2]},
+				"images/scrub.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 78, "h" : 114, "total_w" : 624, "total_h" : 1368, "orientation" : "v", "selection_size" : 30, "collision_size" : 30, "animation" : [
+					12, 12, 12, 12, 12, 12, 12, 12], mask : null},
+				"images/steppe.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 32, "h" : 32, "total_w" : 320, "total_h" : 992, "orientation" : "h", "selection_size" : 32, "collision_size" : 32, "animation" : [
+					16,	4, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 16, 16, 16, 16, 20, 4, 5, 16], mask : null},
+				"images/roads.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 32, "h" : 32, "total_w" : 192, "total_h" : 64, "orientation" : "h", "selection_size" : 32, "collision_size" : 32, "animation" : [
+					6, 6], mask : null},
+				"images/house.png" : {"img" : null, "frames" : null, "is_loaded" : false, "w" : 96, "h" : 96, "total_w" : 384, "total_h" : 96, "orientation" : "h", "selection_size" : 80, "collision_size" : 60, "animation" : [
+					2, 2], mask : [1, 1, 1, 1, 0, 1, 1, 0, 1]},
 			};
 
 			function start(json)
@@ -68,6 +69,11 @@
 				}
 				*/
 
+				var x = 22*32 + 16;
+				var y = 5*32 + 16;
+				var house = new Building(x, y, "images/house.png");
+				Screen.get().addItem(house);
+
 				var x1 = 0*32 + 16;
 				var y1 = 5*32 + 16;
 				Screen.get().addItem(new Creature(x1, y1, "images/scrub.png"));
@@ -76,12 +82,7 @@
 				var y2 = 5*32 + 16;
 				Screen.get().addItem(new Creature(x2, y2, "images/scrub.png"));
 
-				x2 = 22*32 + 16;
-				y2 = 5*32 + 16;
-				Screen.get().addItem(new PhysicItem(x2, y2, "images/house.png"));
-
-				//Screen.get().items[1].findPath(x1, y1);
-				Screen.get().items[0].moveOnPathTo(467, 336);
+				//Screen.get().items[0].moveOnPathTo(467, 336);
 
 				Screen.get().looping = true;
 				Screen.get().loop();
@@ -118,6 +119,7 @@
 				<td><input type="checkbox" id="chk_path" checked onchange="update_screen()"/> Path</td>
 				<td><input type="checkbox" id="chk_path_analysis" checked onchange="update_screen()"/> Path Analysis</td>
 				<td><input type="checkbox" id="chk_collision" checked onchange="update_screen()"/> Collision</td>
+				<td><input type="checkbox" id="chk_mask" checked onchange="update_screen()"/> Mask</td>
 			</tr>
 		</table>
 		<br />

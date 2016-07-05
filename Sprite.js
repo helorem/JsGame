@@ -46,6 +46,12 @@ Sprite.prototype.setIndex = function(index)
 	this.setUpdateNeeded(true);
 }
 
+Sprite.prototype.setAnimationIndex = function(index)
+{
+	this.animation_index = index;
+	this.setUpdateNeeded(true);
+}
+
 Sprite.prototype.getFrame = function()
 {
 	var frame = this.frames[this.index][this.animation_index];

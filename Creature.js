@@ -7,8 +7,26 @@ function Creature(x, y, img_file)
 	this.direction = 0;
 	this.steps = null;
 	this.path = null;
+	this.building = null;
+	this.colliding_items = [];
 }
 extend(PhysicItem, Creature);
+
+Creature.prototype.setBuilding = function(building)
+{
+	if (building != this.building)
+	{
+		if (this.building)
+		{
+			this.building.onExit(this);
+		}
+		this.building = building;
+		if (this.building)
+		{
+			this.building.onEnter(this);
+		}
+	}
+}
 
 Creature.prototype.setDirection = function(direction)
 {
@@ -161,6 +179,8 @@ Creature.prototype.update = function(timestamp)
 			var collision = false;
 			this.calcShapes();
 			//console.debug("test collision", this.x, this.y, this.selection_size, this.square);
+			
+			// TEst background collision
 			var item;
 			var items = Screen.get().background_items;
 			for (var i in items)
@@ -168,24 +188,38 @@ Creature.prototype.update = function(timestamp)
 				item = items[i];
 				if (item != this && this.isColliding(item))
 				{
-					console.debug("collision detected with", item.x, item.y, item.square);
 					collision = true;
-					break;
 				}
 			}
+
 			if (!collision)
 			{
+				// Test items collisions
+				var colliding_items = [];
 				var items = Screen.get().items;
 				for (var i in items)
 				{
 					item = items[i];
 					if (item != this && this.isColliding(item))
 					{
-						console.debug("collision detected with", item.x, item.y, item.square);
-						collision = true;
-						break;
+						colliding_items.push(item)
+						collision = item.onCollision(this);
 					}
 				}
+				for (var i in this.colliding_items)
+				{
+					item = this.colliding_items[i];
+					if (colliding_items.indexOf(item) == -1)
+					{
+						item.onCollisionOver(this);
+					}
+				}
+				for (var i in colliding_items)
+				{
+					item = colliding_items[i];
+					collision |= item.onCollision(this);
+				}
+				this.colliding_items = colliding_items;
 			}
 
 			if (collision)

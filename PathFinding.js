@@ -67,7 +67,7 @@ PathFinder.prototype.findPath = function(x1, y1, x2, y2)
 				var child = childs[i];
 				if (child)
 				{
-					if (child.type == TYPE_WATER || child.type == TYPE_WALL1 || child.type == TYPE_WALL2)
+					if (child.type == TYPE_WATER || child.type == TYPE_WALL1 || child.type == TYPE_WALL2 || child.type == TYPE_BUILDING)
 					{
 						// we cannot walk on the tile
 					}
